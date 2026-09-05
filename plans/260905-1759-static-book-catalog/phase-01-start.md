@@ -40,7 +40,7 @@ book/
     adapters/             # one module per source (Phase 2)
     build-index.mjs       # Phase 4
     validate.mjs          # schema check over books.ndjson
-  site/                   # GitHub Pages root
+  docs/                   # GitHub Pages root
   .github/workflows/
 ```
 

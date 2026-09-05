@@ -3,9 +3,9 @@
  * Build the static site payload from data/books.ndjson.
  *
  * Emits:
- *   site/data/index.json      compact search index, loaded once
- *   site/data/shards/NN.json  full detail, fetched only when a book is opened
- *   site/data/facets.json     taxonomy for the filter sidebar
+ *   docs/data/index.json      compact search index, loaded once
+ *   docs/data/shards/NN.json  full detail, fetched only when a book is opened
+ *   docs/data/facets.json     taxonomy for the filter sidebar
  *
  * Design note: this deliberately does NOT use a search engine library. With
  * ~7k records searching only title and author, the whole index is a few
@@ -16,12 +16,12 @@
 import { readFile, writeFile, mkdir, rm, cp } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
-import { fold } from '../site/fold.mjs'
+import { fold } from '../docs/fold.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const BOOKS = resolve(root, 'data/books.ndjson')
 const FACETS = resolve(root, 'data/facets.json')
-const OUT = resolve(root, 'site/data')
+const OUT = resolve(root, 'docs/data')
 const SHARD_SIZE = 200
 const RELATED_COUNT = 8
 
@@ -139,10 +139,10 @@ try {
 
 // Vendor fflate's browser build so the site has no external runtime fetch.
 try {
-  await mkdir(resolve(root, 'site/vendor'), { recursive: true })
+  await mkdir(resolve(root, 'docs/vendor'), { recursive: true })
   await cp(
     resolve(root, 'node_modules/fflate/umd/index.js'),
-    resolve(root, 'site/vendor/fflate.js'),
+    resolve(root, 'docs/vendor/fflate.js'),
   )
 } catch (err) {
   console.warn(`warning: could not vendor fflate (${err.code}); offline font-stripping will be disabled`)

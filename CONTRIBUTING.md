@@ -8,7 +8,7 @@ committed so the site works from a plain clone.
 ```
 scripts/ingest.mjs        vi.wikisource API  -> data/books.ndjson
 scripts/derive-facets.mjs data/books.ndjson  -> data/facets.json + categories
-scripts/build-index.mjs   data/books.ndjson  -> site/data/*
+scripts/build-index.mjs   data/books.ndjson  -> docs/data/*
 scripts/validate.mjs      gate on data/books.ndjson
 ```
 
@@ -30,10 +30,10 @@ When reviewing a refresh PR, check the record count first.
 
 ```bash
 npm test           # folding fixtures + schema/uniqueness/sort validation
-npm run build      # site/data must be regenerated when data changes
+npm run build      # docs/data must be regenerated when data changes
 ```
 
-CI fails if `site/data` is stale, because the site is served straight from the
+CI fails if `docs/data` is stale, because the site is served straight from the
 repository.
 
 ## Rules that are not negotiable

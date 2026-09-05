@@ -73,17 +73,17 @@ this size does not justify a toolchain.
 
 ## Related Code Files
 
-- Create: `site/index.html`, `site/style.css`
-- Create: `site/app.mjs` (search, facets, routing)
-- Create: `site/book.mjs` (detail view, download links)
+- Create: `docs/index.html`, `docs/style.css`
+- Create: `docs/app.mjs` (search, facets, routing)
+- Create: `docs/book.mjs` (detail view, download links)
 - Create: `scripts/build-index.mjs` (compact index + shard writer)
-- Create: `site/search.mjs`, `site/fold.mjs` (scan + Vietnamese folding)
+- Create: `docs/search.mjs`, `docs/fold.mjs` (scan + Vietnamese folding)
 
 ## Implementation Steps
 
 1. `build-index.mjs`: read `books.ndjson` and emit a compact index of
    `[title, author, foldedText, categoryIds]` per work.
-2. Same script writes `site/data/shards/NN.json` keyed by ordinal, and
+2. Same script writes `docs/data/shards/NN.json` keyed by ordinal, and
    publishes `shardSize` in the index so the layout has one source of truth.
 3. `index.html`: search input, facet sidebar, results list. Server-render
    nothing; load the index once on startup.

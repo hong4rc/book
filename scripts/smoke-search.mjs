@@ -12,12 +12,12 @@
 import { readFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
-import { fold, tokenize } from '../site/fold.mjs'
+import { fold, tokenize } from '../docs/fold.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const index = JSON.parse(await readFile(resolve(root, 'site/data/index.json'), 'utf8'))
+const index = JSON.parse(await readFile(resolve(root, 'docs/data/index.json'), 'utf8'))
 
-// Mirrors site/search.mjs scoring. Kept in step by this test failing loudly if
+// Mirrors docs/search.mjs scoring. Kept in step by this test failing loudly if
 // ranking behaviour drifts.
 function rank(query) {
   const queryFolded = fold(query)

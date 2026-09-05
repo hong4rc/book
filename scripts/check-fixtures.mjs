@@ -8,7 +8,7 @@
  * ơ ư), and the đ/Đ case that NFD does NOT decompose — the classic bug, where
  * "dong" fails to match "đông".
  */
-import { fold, tokenize } from '../site/fold.mjs'
+import { fold, tokenize } from '../docs/fold.mjs'
 
 let failures = 0
 const check = (label, actual, expected) => {

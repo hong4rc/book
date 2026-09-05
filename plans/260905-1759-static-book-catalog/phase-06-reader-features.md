@@ -89,11 +89,11 @@ is the obvious failure mode of this scoring.
 
 ## Related Code Files
 
-- Create: `site/bookmarks.mjs` (localStorage, export/import as JSON)
-- Create: `site/offline.mjs` (IndexedDB, fflate repack, quota handling)
-- Create: `site/related.mjs` (render precomputed related list)
+- Create: `docs/bookmarks.mjs` (localStorage, export/import as JSON)
+- Create: `docs/offline.mjs` (IndexedDB, fflate repack, quota handling)
+- Create: `docs/related.mjs` (render precomputed related list)
 - Modify: `scripts/build-index.mjs` (emit `related` into each shard)
-- Modify: `site/book.mjs`, `site/app.mjs` (wire the UI)
+- Modify: `docs/book.mjs`, `docs/app.mjs` (wire the UI)
 
 ## Implementation Steps
 

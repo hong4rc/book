@@ -110,7 +110,7 @@ stays small enough to clone in seconds.
                                            (detail, lazy-loaded)            (chunked, WASM)
                                                     +-------------+-------------+
                                                                   v
-                                                          site/ -> GitHub Pages
+                                                          docs/ -> GitHub Pages
                                                                   |
                                              download click ------+--> ws-export.wmcloud.org
                                                                        (EPUB built on demand)
