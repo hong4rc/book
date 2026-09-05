@@ -85,6 +85,23 @@ for (const [a, b] of distinct) {
   }
 }
 
+/* --------------------------- fold is decomposable across a space separator */
+// build-index.mjs stores only the folded title's LENGTH and recovers the folded
+// title as foldedText.slice(0, length). That is valid only while
+// fold(`${title} ${author}`) === fold(title) + ' ' + fold(author).
+// If fold() ever gains a non-per-character rule, this breaks search ranking
+// silently — so assert the identity here rather than discover it in production.
+for (const [title, author] of [
+  ['Truyện Kiều', 'Nguyễn Du'],
+  ['Đường về quê mẹ', 'Đặng Trần Côn'],
+  ['Bình Ngô đại cáo', null],
+  ['Cung oán ngâm khúc', 'Nguyễn Gia Thiều'],
+]) {
+  const combined = fold(`${title} ${author ?? ''}`)
+  const foldedTitle = fold(title)
+  check(`slice identity ${title}`, combined.slice(0, foldedTitle.length), foldedTitle)
+}
+
 /* ----------------------------------------------------------------- tokenize */
 check('tokenize spacing', tokenize('  Truyện   Kiều  ').join('|'), 'truyen|kieu')
 check('tokenize punctuation', tokenize('Bình Ngô, đại cáo!').join('|'), 'binh|ngo|dai|cao')
@@ -94,4 +111,4 @@ if (failures > 0) {
   console.error(`\nFAILED: ${failures} assertion(s)`)
   process.exit(1)
 }
-console.log(`OK: ${tones.length + titles.length + matches.length + distinct.length + 3} folding assertions passed`)
+console.log(`OK: ${tones.length + titles.length + matches.length + distinct.length + 4 + 3} folding assertions passed`)

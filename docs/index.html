@@ -20,8 +20,10 @@
 
   <div class="search">
     <label class="sr-only" for="q">Search by title or author</label>
+    <!-- No autofocus: it competes with the detail dialog's close button when
+         the page opens on a #book/N deep link. -->
     <input id="q" type="search" placeholder="Tìm theo tên sách hoặc tác giả…"
-           autocomplete="off" spellcheck="false" autofocus>
+           autocomplete="off" spellcheck="false">
   </div>
 
   <nav class="views">
@@ -34,15 +36,21 @@
 </header>
 
 <main class="layout">
-  <aside id="facet-panel" class="sidebar">
-    <h2>Categories</h2>
-    <ul id="facets" class="facets"></ul>
+  <aside class="sidebar">
+    <!-- Only the category list is view-specific. The bookmark controls stay
+         visible, since they are most wanted in the Bookmarks view itself. -->
+    <div id="facets-section">
+      <h2>Categories</h2>
+      <ul id="facets" class="facets"></ul>
+    </div>
 
     <h2>Bookmarks</h2>
     <div class="stack">
       <button type="button" class="btn btn-quiet" id="export">Export</button>
-      <label class="btn btn-quiet" for="import">Import</label>
-      <input type="file" id="import" accept="application/json,.json" hidden>
+      <!-- A real button, not a <label>: labels are not keyboard-focusable, so
+           a label-wrapped file input cannot be triggered by Enter or Space. -->
+      <button type="button" class="btn btn-quiet" id="import">Import</button>
+      <input type="file" id="import-file" accept="application/json,.json" hidden>
     </div>
   </aside>
 

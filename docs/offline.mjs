@@ -20,6 +20,12 @@ const STORE = 'books'
 
 let dbPromise = null
 
+/**
+ * Note this is necessary but NOT sufficient: indexedDB is defined yet still
+ * unusable in a Firefox private window, in partitioned-storage contexts, and
+ * wherever opening throws SecurityError. Callers must also handle rejection —
+ * see the try/catch at every call site.
+ */
 export function isSupported() {
   return typeof indexedDB !== 'undefined'
 }
@@ -27,7 +33,14 @@ export function isSupported() {
 function openDb() {
   if (dbPromise) return dbPromise
   dbPromise = new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VERSION)
+    let req
+    try {
+      req = indexedDB.open(DB_NAME, DB_VERSION)
+    } catch (err) {
+      // Some browsers throw synchronously rather than firing onerror.
+      reject(err)
+      return
+    }
     req.onupgradeneeded = () => {
       if (!req.result.objectStoreNames.contains(STORE)) {
         req.result.createObjectStore(STORE, { keyPath: 'ord' })
@@ -35,7 +48,11 @@ function openDb() {
     }
     req.onsuccess = () => resolve(req.result)
     req.onerror = () => reject(req.error)
+    req.onblocked = () => reject(new Error('IndexedDB blocked by another tab'))
   })
+  // Do not cache a rejected promise: otherwise one transient failure disables
+  // offline storage for the rest of the session with no way to recover.
+  dbPromise.catch(() => { dbPromise = null })
   return dbPromise
 }
 
@@ -57,12 +74,20 @@ function tx(mode, fn) {
  * Returns the original bytes untouched if anything looks wrong — a slightly
  * large book that opens is strictly better than a small one that does not.
  */
-function stripFonts(buffer) {
+async function stripFonts(buffer) {
   const fflate = globalThis.fflate
   if (!fflate) return { bytes: new Uint8Array(buffer), stripped: false }
 
+  // Async (worker-backed) rather than unzipSync/zipSync: an EPUB is ~8MB
+  // uncompressed, and inflating then re-deflating it on the main thread freezes
+  // the tab for a noticeable stretch on mobile.
+  const unzip = (data) =>
+    new Promise((res, rej) => fflate.unzip(data, (err, out) => (err ? rej(err) : res(out))))
+  const zip = (obj) =>
+    new Promise((res, rej) => fflate.zip(obj, (err, out) => (err ? rej(err) : res(out))))
+
   try {
-    const files = fflate.unzipSync(new Uint8Array(buffer))
+    const files = await unzip(new Uint8Array(buffer))
     const out = {}
 
     // The OCF spec requires `mimetype` to be the first entry and stored
@@ -91,7 +116,7 @@ function stripFonts(buffer) {
 
     if (removed === 0) return { bytes: new Uint8Array(buffer), stripped: false }
 
-    const zipped = fflate.zipSync(out)
+    const zipped = await zip(out)
     // Sanity check: a repack that grew, or lost the mimetype, is not trusted.
     if (!out['mimetype'] || zipped.length >= buffer.byteLength) {
       return { bytes: new Uint8Array(buffer), stripped: false }
@@ -114,7 +139,7 @@ export async function save(ord, { title, url, strip = true }) {
   const originalSize = buffer.byteLength
 
   const { bytes, stripped } = strip
-    ? stripFonts(buffer)
+    ? await stripFonts(buffer)
     : { bytes: new Uint8Array(buffer), stripped: false }
 
   const record = {

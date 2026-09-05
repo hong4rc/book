@@ -10,17 +10,19 @@
   "scripts": {
     "validate": "node scripts/validate.mjs",
     "fixtures": "node scripts/check-fixtures.mjs",
-    "test": "npm run fixtures && npm run validate",
+    "test": "npm run fixtures && npm run validate && npm run smoke",
     "ingest": "node scripts/ingest.mjs",
     "facets": "node scripts/derive-facets.mjs",
     "build": "node scripts/build-index.mjs",
     "refresh": "npm run ingest && npm run facets && npm run validate && npm run build",
-    "serve": "npx --yes serve site"
+    "serve": "npx --yes serve docs",
+    "smoke": "node scripts/smoke-search.mjs && node scripts/smoke-dom.mjs"
   },
   "devDependencies": {
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
-    "fflate": "^0.8.3"
+    "fflate": "^0.8.3",
+    "jsdom": "^29.1.1"
   },
   "license": "MIT"
 }

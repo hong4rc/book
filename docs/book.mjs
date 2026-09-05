@@ -18,8 +18,17 @@ async function loadShard(n) {
     if (!res.ok) throw new Error(`could not load shard ${n} (HTTP ${res.status})`)
     return res.json()
   })
-  shardCache.set(n, promise)
-  return promise
+  // Evict on failure. Caching a rejected promise would make one flaky moment
+  // permanently break all 200 books in that shard for the rest of the session,
+  // with retries failing instantly and no request ever being made again.
+  shardCache.set(
+    n,
+    promise.catch((err) => {
+      shardCache.delete(n)
+      throw err
+    }),
+  )
+  return shardCache.get(n)
 }
 
 export async function getBook(ord) {
@@ -38,9 +47,19 @@ const el = (tag, props = {}, children = []) => {
   return node
 }
 
+/** Only ever emit links the browser will navigate, never javascript: or data:. */
+const safeUrl = (url) => {
+  try {
+    return new URL(url, location.href).protocol === 'https:' ? url : null
+  } catch {
+    return null
+  }
+}
+
 function downloadRow(book) {
   const row = el('div', { className: 'downloads' })
   for (const d of book.downloads) {
+    if (!safeUrl(d.url)) continue
     row.append(
       el('a', {
         className: 'btn' + (d.format === 'epub' ? ' btn-primary' : ''),
@@ -54,6 +73,7 @@ function downloadRow(book) {
       }),
     )
   }
+  if (!safeUrl(book.sourceUrl)) return row
   row.append(
     el('a', {
       className: 'btn btn-quiet',
@@ -67,7 +87,7 @@ function downloadRow(book) {
   return row
 }
 
-async function offlineControls(ord, book) {
+async function offlineControls(ord, book, onChange) {
   const wrap = el('div', { className: 'offline' })
   if (!offline.isSupported()) return wrap
 
@@ -102,6 +122,7 @@ async function offlineControls(ord, book) {
         await offline.save(ord, { title: book.title, url: epub.url, strip: true })
       }
       await render()
+      onChange?.() // keep the header count and Offline view in step
     } catch (err) {
       status.textContent = err.message
     } finally {
@@ -109,7 +130,14 @@ async function offlineControls(ord, book) {
     }
   })
 
-  await render()
+  // IndexedDB can be present yet unusable (private windows, partitioned
+  // storage, SecurityError). Offline saving is a bonus; losing it must never
+  // cost the user the title, metadata and download links on this panel.
+  try {
+    await render()
+  } catch {
+    return el('div', { className: 'offline' })
+  }
   wrap.append(button, status)
   return wrap
 }
@@ -133,7 +161,7 @@ function relatedList(book, onOpen) {
   return list.children.length ? el('section', {}, [el('h3', { textContent: 'Related books' }), list]) : null
 }
 
-export async function renderDetail(ord, { onOpen, onClose }) {
+export async function renderDetail(ord, { onOpen, onClose, onOfflineChange }) {
   const book = await getBook(ord)
   const panel = el('div', { className: 'detail' })
 
@@ -165,7 +193,11 @@ export async function renderDetail(ord, { onOpen, onClose }) {
       : null,
     el('div', { className: 'chips' }, book.categories.map((c) => el('span', { className: 'chip', textContent: c }))),
     downloadRow(book),
-    await offlineControls(ord, book),
+    // The bookmark button sits with the other actions. It was previously
+    // constructed and wired but never appended, so bookmarking silently did
+    // nothing at all.
+    el('div', { className: 'actions' }, [bookmark]),
+    await offlineControls(ord, book, onOfflineChange),
     relatedList(book, onOpen),
   )
   return panel

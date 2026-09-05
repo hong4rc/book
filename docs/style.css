@@ -110,6 +110,13 @@ a { color: inherit; }
 
 /* ---------------------------------------------------------------- detail */
 
+/* MUST come before the display rule below and must stay.
+   The `hidden` attribute only hides via the UA stylesheet's [hidden]{display:none},
+   and ANY author `display` declaration outranks it by origin, regardless of
+   specificity. Without this, .overlay{display:grid} keeps a fixed, full-viewport,
+   z-index:10 layer permanently on screen, swallowing every click on the page. */
+.overlay[hidden] { display: none; }
+
 .overlay {
   position: fixed; inset: 0; z-index: 10;
   display: grid; place-items: start center;
@@ -147,6 +154,7 @@ a { color: inherit; }
 }
 
 .downloads { display: flex; flex-wrap: wrap; gap: .4rem; margin: .9rem 0 .6rem; }
+.actions { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .6rem; }
 .offline { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
 
 .related { list-style: none; margin: 0; padding: 0; display: grid; gap: .3rem; }

@@ -86,7 +86,17 @@ function computeRelated() {
 
 computeRelated()
 
-// Compact index: [title, author, foldedSearchText, [categoryIds]]
+// Compact index: [title, author, foldedText, [categoryIds], titleFoldLength]
+//
+// Scoring needs the folded TITLE alone, but folding at query time runs
+// normalize('NFD') plus two regex passes per candidate per keystroke, which
+// dominated search cost. Storing a second folded string would fix the speed and
+// cost ~230KB of duplication, since foldedText already begins with it.
+//
+// So store only its length: fold() is per-character apart from a trim, hence
+// fold(`${title} ${author}`) === fold(title) + ' ' + fold(author), and the
+// folded title is exactly foldedText.slice(0, titleFoldLength).
+// check-fixtures.mjs asserts that identity holds.
 const index = {
   generated: new Date().toISOString().slice(0, 10),
   total: records.length,
@@ -99,6 +109,7 @@ const index = {
     r.author,
     fold(`${r.title} ${r.author ?? ''}`),
     (r.categories ?? []).map((c) => categoryIndex.get(c)),
+    fold(r.title).length,
   ]),
 }
 

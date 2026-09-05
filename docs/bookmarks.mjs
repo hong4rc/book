@@ -44,6 +44,7 @@ export function toggle(ord, title) {
 /** Ordinals, most recently added first. */
 export function list() {
   return Object.entries(read())
+    .filter(([ord, value]) => Number.isInteger(Number(ord)) && value && typeof value === 'object')
     .sort((a, b) => (b[1].addedAt ?? '').localeCompare(a[1].addedAt ?? ''))
     .map(([ord]) => Number(ord))
 }
@@ -63,12 +64,22 @@ export function importJson(text) {
 
   const map = read()
   let added = 0
+  let skipped = 0
   for (const [ord, value] of Object.entries(incoming)) {
+    // Validate before storing. An imported file is arbitrary user input, and a
+    // bad entry would otherwise be written to localStorage and then crash the
+    // Bookmarks view on every later render, with no way to recover from the UI.
+    const n = Number(ord)
+    if (!Number.isInteger(n) || n < 0 || !value || typeof value !== 'object') {
+      skipped++
+      continue
+    }
     if (!Object.hasOwn(map, ord)) {
-      map[ord] = value
+      map[ord] = { title: String(value.title ?? ''), addedAt: String(value.addedAt ?? '') }
       added++
     }
   }
+  if (added === 0 && skipped > 0) throw new Error(`no usable bookmarks found (${skipped} skipped)`)
   if (!write(map)) throw new Error('could not save bookmarks; storage may be full or blocked')
   return added
 }

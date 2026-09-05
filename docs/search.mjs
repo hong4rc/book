@@ -1,9 +1,15 @@
 /**
  * Client-side search over the whole catalogue.
  *
- * A linear scan sounds naive, but with ~6.5k records holding only a title and
- * an author it costs well under a millisecond — far cheaper than the machinery
- * needed to avoid it. No index library, no WASM, no network call per query.
+ * A linear scan over ~6.5k records holding only a title and an author is
+ * cheaper than the machinery needed to avoid it — but only if the per-candidate
+ * work stays genuinely small. Two things keep it that way:
+ *
+ *   - the folded title is precomputed at build time, not derived per keystroke
+ *   - token regexes are compiled once per query, not once per candidate
+ *
+ * Both matter most for a one-character query, which matches nearly the whole
+ * corpus and is exactly when the user is typing fastest.
  */
 import { fold, tokenize } from './fold.mjs'
 
@@ -19,50 +25,34 @@ export async function loadIndex(url = './data/index.json') {
 
 export const getIndex = () => index
 
-/**
- * Score one book against the folded query.
- * Returns -1 when it does not match at all.
- */
-function score(foldedText, title, queryFolded, tokens) {
-  // Every token must appear, so that a multi-word query narrows rather than widens.
-  for (const token of tokens) {
-    if (!foldedText.includes(token)) return -1
-  }
-
-  let s = 0
-  const foldedTitle = fold(title)
-  if (foldedTitle === queryFolded) s += 1000            // exact title
-  else if (foldedTitle.startsWith(queryFolded)) s += 500 // title prefix
-  else if (foldedTitle.includes(queryFolded)) s += 250   // phrase inside title
-
-  // Reward matches at a word boundary over ones buried mid-word.
-  for (const token of tokens) {
-    if (new RegExp(`(^|\\s)${token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`).test(foldedTitle)) s += 40
-  }
-
-  // Prefer shorter titles: with equal evidence the more specific match wins.
-  s += Math.max(0, 60 - title.length / 4)
-  return s
-}
+const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
 /**
  * @param {string} query
  * @param {{categories?: Set<number>, limit?: number}} opts
- * @returns {number[]} ordinals, best first
+ * @returns {{ordinals: number[], total: number}} best first, plus the
+ *   uncapped match count — returned from the same pass so the caller never
+ *   has to run the scan twice to render a "N results" line.
  */
 export function search(query, opts = {}) {
-  if (!index) return []
+  if (!index) return { ordinals: [], total: 0 }
   const { categories, limit = 100 } = opts
   const queryFolded = fold(query)
   const tokens = tokenize(query)
+  const filtering = categories && categories.size > 0
+
+  // Compiled once per query rather than once per book.
+  const boundary = tokens.map((t) => new RegExp(`(^|\\s)${escapeRe(t)}`))
   const results = []
 
   for (let ord = 0; ord < index.books.length; ord++) {
-    const [title, , foldedText, cats] = index.books[ord]
+    const entry = index.books[ord]
+    if (!entry) continue
+    const [title, , foldedText, cats, titleFoldLength] = entry
 
-    if (categories && categories.size > 0) {
-      // Facets are AND-ed with search but OR-ed among themselves: picking two
-      // categories widens the category filter, as a reader expects.
+    if (filtering) {
+      // Facets are AND-ed with the search but OR-ed among themselves: picking
+      // two categories widens the category filter, as a reader expects.
       if (!cats.some((c) => categories.has(c))) continue
     }
 
@@ -71,15 +61,33 @@ export function search(query, opts = {}) {
       continue
     }
 
-    const s = score(foldedText, title, queryFolded, tokens)
-    if (s >= 0) results.push([ord, s])
+    // Every token must appear, so a multi-word query narrows rather than widens.
+    let matched = true
+    for (const token of tokens) {
+      if (!foldedText.includes(token)) { matched = false; break }
+    }
+    if (!matched) continue
+
+    // A slice, not a fold: the expensive normalize/regex work was done at build
+    // time and its result is the front of foldedText.
+    const foldedTitle = foldedText.slice(0, titleFoldLength)
+
+    let s = 0
+    if (foldedTitle === queryFolded) s += 1000            // exact title
+    else if (foldedTitle.startsWith(queryFolded)) s += 500 // title prefix
+    else if (foldedTitle.includes(queryFolded)) s += 250   // phrase inside title
+
+    // Reward matches at a word boundary over ones buried mid-word.
+    for (const re of boundary) if (re.test(foldedTitle)) s += 40
+
+    // Prefer shorter titles: with equal evidence the more specific match wins.
+    s += Math.max(0, 60 - title.length / 4)
+    results.push([ord, s])
   }
 
   results.sort((a, b) => b[1] - a[1] || a[0] - b[0])
-  return results.slice(0, limit).map(([ord]) => ord)
-}
-
-/** Total matches without the result cap, for the "N results" line. */
-export function count(query, opts = {}) {
-  return search(query, { ...opts, limit: Infinity }).length
+  return {
+    ordinals: results.slice(0, limit).map(([ord]) => ord),
+    total: results.length,
+  }
 }
