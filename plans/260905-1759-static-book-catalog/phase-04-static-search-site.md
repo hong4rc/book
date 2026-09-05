@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "Static Search Site"
-status: pending
+status: in-progress
 priority: P1
 effort: "8h"
 dependencies: [3]
@@ -25,18 +25,25 @@ anywhere in the path.
 
 ## Architecture
 
-**Search engine: Pagefind.** Chosen over hand-rolling an index because it
-chunks its index and loads only the fragments a query needs, so the browser
-never downloads the whole corpus. Its Node API indexes records directly:
+**Search engine: none — a plain linear scan.**
 
-```js
-const { index } = await pagefind.createIndex()
-await index.addCustomRecord({ content, meta, filters })  // no HTML files needed
-```
+This reverses the original choice of Pagefind, on evidence gathered once the
+real corpus size was known. Recorded here rather than silently changed.
 
-This matters: the HTML-crawling mode would require generating ~6,900 static
-pages, bloating the repo. `addCustomRecord` gives the same index with none of
-that.
+Pagefind chunks its index so a browser never loads the whole corpus, which is
+the right tool for a large full-text collection. This is not one. The catalogue
+holds **6,482 records searching only title and author** — the entire index is
+roughly 700KB raw and under 250KB gzipped, a single fetch. Scanning 6,482 short
+strings per keystroke costs well under a millisecond, so the machinery that
+avoids the scan costs more than the scan.
+
+Adopting it would have added a WASM runtime, an npm dependency, and a build
+step to avoid work the browser does not notice doing. The plan's own stated
+fallback was the better primary all along; the site ships with **zero runtime
+dependencies** for search.
+
+The one real cost: no full-text search inside book contents. The catalogue only
+ever indexed title and author, so nothing is lost against the stated scope.
 
 **Diacritics are the central correctness concern.** A Vietnamese reader may type
 `truyen kieu` for *Truyện Kiều*. Both must match. The index therefore stores a
@@ -46,9 +53,9 @@ always uses the original, since stripped Vietnamese is a different word.
 
 **Two-tier data load**, keeping first paint small:
 
-- Tier 1: Pagefind index — search results carry just id, title, author.
+- Tier 1: `data/index.json` — title, author, and folded search text only.
 - Tier 2: `data/shards/NN.json` — full detail, fetched only when a book is
-  opened. Shard by `id` hash into ~64 files of ~100 records.
+  opened. Shard by ordinal into files of 200 records.
 
 **Download is a direct link**, built at render time:
 
@@ -61,28 +68,27 @@ No proxy, no CORS problem: it is a plain navigation, and the service sets
 a few seconds for long works, so the UI shows a pending state and offers the
 Wikisource page as a fallback link.
 
-Plain HTML, CSS, and ES modules. No framework and no build step beyond the
-Pagefind index — a static site of this size does not justify a toolchain.
+Plain HTML, CSS, and ES modules. No framework, no bundler — a static site of
+this size does not justify a toolchain.
 
 ## Related Code Files
 
 - Create: `site/index.html`, `site/style.css`
 - Create: `site/app.mjs` (search, facets, routing)
 - Create: `site/book.mjs` (detail view, download links)
-- Create: `scripts/build-index.mjs` (Pagefind custom records + shard writer)
-- Create: `site/pagefind/` (generated, committed)
+- Create: `scripts/build-index.mjs` (compact index + shard writer)
+- Create: `site/search.mjs`, `site/fold.mjs` (scan + Vietnamese folding)
 
 ## Implementation Steps
 
-1. `build-index.mjs`: stream `books.ndjson`, add a Pagefind custom record per
-   work with `content` = `title + author + folded variants`, and filters for
-   category, author, and quality.
-2. Same script writes `data/shards/NN.json` keyed by id hash.
+1. `build-index.mjs`: read `books.ndjson` and emit a compact index of
+   `[title, author, foldedText, categoryIds]` per work.
+2. Same script writes `site/data/shards/NN.json` keyed by ordinal, and
+   publishes `shardSize` in the index so the layout has one source of truth.
 3. `index.html`: search input, facet sidebar, results list. Server-render
-   nothing; hydrate from Pagefind on load.
-4. `app.mjs`: debounce input at ~150ms, fold the query, query Pagefind, render
-   results. Reflect query and active facets in the URL hash so results are
-   shareable and the back button works.
+   nothing; load the index once on startup.
+4. `app.mjs`: fold the query, scan, render. Reflect query and active facets in
+   the URL hash so results are shareable and the back button works.
 5. `book.mjs`: on result click, fetch the shard, render detail, render one
    download button per format plus a Wikisource source link.
 6. Empty, loading, and error states — including ws-export being unreachable.
@@ -104,11 +110,11 @@ Pagefind index — a static site of this size does not justify a toolchain.
 
 ## Risk Assessment
 
-- **Pagefind bundle too large or too many files.** ~6,900 records should be
-  comfortable, but this is unverified at this scale. Signal: index over 100MB,
-  or cold load over 3s. Response: fall back to a single MiniSearch index over
-  title and author only — roughly 6,900 records is a few MB gzipped, entirely
-  viable, at the cost of full-text depth.
+- **Index outgrows a single fetch.** Resolved for now: 6,482 records produce a
+  sub-1MB index. Signal: the corpus grows past roughly 50k records, or cold load
+  exceeds 3s. Response: shard the index by first folded letter and load lazily,
+  or revisit a chunked engine — the scan is easy to replace precisely because
+  nothing else depends on how search is implemented.
 - **Diacritic folding is wrong.** Highest-likelihood correctness bug in the
   phase. Response: a fixture list of 30 Vietnamese title/query pairs asserted in
   CI, covering every Vietnamese vowel-plus-tone combination.

@@ -89,12 +89,12 @@ stays small enough to clone in seconds.
 
 | # | Phase | Status |
 |---|-------|--------|
-| 1 | [Phase 1: Repo and Data Contract](./phase-01-start.md) | Pending |
-| 2 | [Phase 2: Ingest Adapters](./phase-02-ingest-adapters.md) | Pending |
-| 3 | [Phase 3: Category Analysis](./phase-03-category-analysis.md) | Pending |
-| 4 | [Phase 4: Static Search Site](./phase-04-static-search-site.md) | Pending |
-| 5 | [Phase 5: CI and Publish](./phase-05-ci-and-publish.md) | Pending |
-| 6 | [Phase 6: Reader Features](./phase-06-reader-features.md) | Pending |
+| 1 | [Phase 1: Repo and Data Contract](./phase-01-start.md) | Completed |
+| 2 | [Phase 2: Ingest Adapters](./phase-02-ingest-adapters.md) | In progress |
+| 3 | [Phase 3: Category Analysis](./phase-03-category-analysis.md) | In progress |
+| 4 | [Phase 4: Static Search Site](./phase-04-static-search-site.md) | In progress |
+| 5 | [Phase 5: CI and Publish](./phase-05-ci-and-publish.md) | In progress |
+| 6 | [Phase 6: Reader Features](./phase-06-reader-features.md) | In progress |
 
 ## Architecture
 

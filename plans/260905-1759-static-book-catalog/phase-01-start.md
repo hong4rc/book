@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Repo and Data Contract"
-status: pending
+status: completed
 priority: P1
 effort: "3h"
 dependencies: []

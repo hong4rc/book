@@ -1,7 +1,7 @@
 ---
 phase: 5
 title: "CI and Publish"
-status: pending
+status: in-progress
 priority: P2
 effort: "4h"
 dependencies: [4]

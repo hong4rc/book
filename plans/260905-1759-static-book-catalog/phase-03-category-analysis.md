@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "Category Analysis"
-status: pending
+status: in-progress
 priority: P1
 effort: "5h"
 dependencies: [2]

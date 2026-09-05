@@ -1,0 +1,448 @@
+{
+  "generated": "2026-09-05",
+  "total": 6482,
+  "categories": [
+    {
+      "name": "Thơ ca",
+      "count": 2700
+    },
+    {
+      "name": "Pháp luật",
+      "count": 1663
+    },
+    {
+      "name": "Khác",
+      "count": 717
+    },
+    {
+      "name": "Báo chí",
+      "count": 549
+    },
+    {
+      "name": "Văn kiện",
+      "count": 455
+    },
+    {
+      "name": "Truyện",
+      "count": 374
+    },
+    {
+      "name": "Tôn giáo",
+      "count": 167
+    },
+    {
+      "name": "Diễn văn",
+      "count": 106
+    },
+    {
+      "name": "Lịch sử",
+      "count": 54
+    },
+    {
+      "name": "Nghiên cứu",
+      "count": 5
+    }
+  ],
+  "topAuthors": [
+    {
+      "name": "Phan Khôi",
+      "count": 530
+    },
+    {
+      "name": "Nguyễn Bính",
+      "count": 227
+    },
+    {
+      "name": "Nguyễn Du",
+      "count": 226
+    },
+    {
+      "name": "Jean de La Fontaine",
+      "count": 198
+    },
+    {
+      "name": "Lê Thánh Tông",
+      "count": 191
+    },
+    {
+      "name": "Nguyễn Trãi",
+      "count": 153
+    },
+    {
+      "name": "Hồ Chí Minh",
+      "count": 148
+    },
+    {
+      "name": "Trần Tế Xương",
+      "count": 135
+    },
+    {
+      "name": "Hàn Mặc Tử",
+      "count": 123
+    },
+    {
+      "name": "Phan Bội Châu",
+      "count": 106
+    },
+    {
+      "name": "Nguyễn Khuyến",
+      "count": 104
+    },
+    {
+      "name": "Bích Khê",
+      "count": 97
+    },
+    {
+      "name": "Đông Hồ",
+      "count": 89
+    },
+    {
+      "name": "Nguyễn Công Trứ",
+      "count": 82
+    },
+    {
+      "name": "Nhượng Tống",
+      "count": 79
+    },
+    {
+      "name": "Trương Tấn Sang",
+      "count": 70
+    },
+    {
+      "name": "Lỗ Tấn",
+      "count": 62
+    },
+    {
+      "name": "Lương Cường",
+      "count": 58
+    },
+    {
+      "name": "Hồ Xuân Hương",
+      "count": 57
+    },
+    {
+      "name": "Hồ Biểu Chánh",
+      "count": 49
+    },
+    {
+      "name": "Nguyễn Phú Trọng",
+      "count": 44
+    },
+    {
+      "name": "Tản Đà",
+      "count": 43
+    },
+    {
+      "name": "Trần Nguyên Đán",
+      "count": 43
+    },
+    {
+      "name": "Nguyễn Bỉnh Khiêm",
+      "count": 42
+    },
+    {
+      "name": "Nam Trân",
+      "count": 38
+    },
+    {
+      "name": "Quốc hội Việt Nam",
+      "count": 38
+    },
+    {
+      "name": "Trần Đại Quang",
+      "count": 35
+    },
+    {
+      "name": "Thạch Lam",
+      "count": 34
+    },
+    {
+      "name": "Cao Bá Quát",
+      "count": 33
+    },
+    {
+      "name": "Bộ Ngoại giao Nga",
+      "count": 33
+    },
+    {
+      "name": "Nguyễn Đình Chiểu",
+      "count": 33
+    },
+    {
+      "name": "Nam Cao",
+      "count": 32
+    },
+    {
+      "name": "Ngô Tất Tố",
+      "count": 31
+    },
+    {
+      "name": "Mạc Thiên Tứ",
+      "count": 31
+    },
+    {
+      "name": "Lý Bạch",
+      "count": 27
+    },
+    {
+      "name": "Nguyễn Trung Ngạn",
+      "count": 27
+    },
+    {
+      "name": "Trần Nhân Tông",
+      "count": 27
+    },
+    {
+      "name": "Nguyễn Văn Vĩnh",
+      "count": 26
+    },
+    {
+      "name": "Trần Minh Tông",
+      "count": 25
+    },
+    {
+      "name": "Barack Obama",
+      "count": 23
+    },
+    {
+      "name": "Thâm Tâm",
+      "count": 21
+    },
+    {
+      "name": "Ted Osius",
+      "count": 19
+    },
+    {
+      "name": "Trần Trọng Kim",
+      "count": 18
+    },
+    {
+      "name": "Dương Bá Trạc",
+      "count": 18
+    },
+    {
+      "name": "Huỳnh Thúc Kháng",
+      "count": 17
+    },
+    {
+      "name": "Võ Văn Thưởng",
+      "count": 17
+    },
+    {
+      "name": "Bùi Hữu Nghĩa",
+      "count": 16
+    },
+    {
+      "name": "Hillary Rodham Clinton",
+      "count": 16
+    },
+    {
+      "name": "Phạm Hầu",
+      "count": 16
+    },
+    {
+      "name": "Ủy ban Thường vụ Quốc hội Việt Nam",
+      "count": 16
+    },
+    {
+      "name": "Phan Kế Bính",
+      "count": 15
+    },
+    {
+      "name": "Phan Châu Trinh",
+      "count": 15
+    },
+    {
+      "name": "Chu Văn An",
+      "count": 15
+    },
+    {
+      "name": "Học Lạc",
+      "count": 14
+    },
+    {
+      "name": "Phan Văn Trị",
+      "count": 14
+    },
+    {
+      "name": "Daniel Joseph Kritenbrink",
+      "count": 13
+    },
+    {
+      "name": "John Kerry",
+      "count": 13
+    },
+    {
+      "name": "Michael Richard Pompeo",
+      "count": 13
+    },
+    {
+      "name": "Trần Anh Tông",
+      "count": 13
+    },
+    {
+      "name": "Vân Đài",
+      "count": 13
+    },
+    {
+      "name": "Trương Minh Ký",
+      "count": 13
+    },
+    {
+      "name": "Nguyễn Xuân Phúc",
+      "count": 13
+    },
+    {
+      "name": "Tôn Nữ Thu Hồng",
+      "count": 12
+    },
+    {
+      "name": "Trần Thánh Tông",
+      "count": 12
+    },
+    {
+      "name": "Donald John Trump",
+      "count": 12
+    },
+    {
+      "name": "Nguyễn Hữu Huân",
+      "count": 12
+    },
+    {
+      "name": "Khuyết danh",
+      "count": 11
+    },
+    {
+      "name": "Chu Mạnh Trinh",
+      "count": 11
+    },
+    {
+      "name": "Nguyễn Nhược Pháp",
+      "count": 11
+    },
+    {
+      "name": "Bùi Thế Mỹ",
+      "count": 11
+    },
+    {
+      "name": "Tô Lâm",
+      "count": 11
+    },
+    {
+      "name": "Bùi Kỷ",
+      "count": 10
+    },
+    {
+      "name": "Bảo Đại",
+      "count": 10
+    },
+    {
+      "name": "Bà Huyện Thanh Quan",
+      "count": 10
+    },
+    {
+      "name": "Ngô Đức Kế",
+      "count": 10
+    },
+    {
+      "name": "J. Leiba",
+      "count": 9
+    },
+    {
+      "name": "Diệp Văn Kỳ",
+      "count": 9
+    },
+    {
+      "name": "Huỳnh Tịnh Của",
+      "count": 9
+    },
+    {
+      "name": "Phan Thanh Giản",
+      "count": 9
+    },
+    {
+      "name": "Phạm Quỳnh",
+      "count": 8
+    },
+    {
+      "name": "Khuất Nguyên",
+      "count": 8
+    },
+    {
+      "name": "Lê Văn Trương",
+      "count": 7
+    },
+    {
+      "name": "Hoàng Tích Chu",
+      "count": 7
+    },
+    {
+      "name": "Hồ Quý Ly",
+      "count": 7
+    },
+    {
+      "name": "Ngô Văn Triện",
+      "count": 7
+    },
+    {
+      "name": "Kamala Devi Harris",
+      "count": 7
+    },
+    {
+      "name": "Nguyễn Thông",
+      "count": 6
+    },
+    {
+      "name": "Antony Blinken",
+      "count": 6
+    },
+    {
+      "name": "Trương Hán Siêu",
+      "count": 6
+    },
+    {
+      "name": "Ngô Đình Diệm",
+      "count": 6
+    },
+    {
+      "name": "Nguyễn Ngọc Tương",
+      "count": 6
+    },
+    {
+      "name": "Huỳnh Mẫn Đạt",
+      "count": 6
+    },
+    {
+      "name": "William Jefferson Clinton",
+      "count": 6
+    },
+    {
+      "name": "Trần Nghệ Tông",
+      "count": 6
+    },
+    {
+      "name": "Từ Diễn Đồng",
+      "count": 6
+    },
+    {
+      "name": "Mạc Đĩnh Chi",
+      "count": 6
+    },
+    {
+      "name": "Hoàng Cao Khải",
+      "count": 6
+    },
+    {
+      "name": "Trần Quang Khải",
+      "count": 6
+    },
+    {
+      "name": "Tôn Thọ Tường",
+      "count": 6
+    },
+    {
+      "name": "T.T.Kh",
+      "count": 5
+    }
+  ]
+}

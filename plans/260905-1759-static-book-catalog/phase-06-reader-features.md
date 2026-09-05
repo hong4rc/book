@@ -1,7 +1,7 @@
 ---
 phase: 6
 title: "Reader Features"
-status: pending
+status: in-progress
 priority: P2
 effort: "6h"
 dependencies: [4]

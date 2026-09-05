@@ -1,0 +1,147 @@
+{
+  "$comment": "Hand-editable. Category derivation is a lossy judgement call, so it lives in data rather than code and can be retuned without touching the pipeline. rawCategories is retained on every record so the taxonomy can be re-derived offline at any time. Terms below were chosen against the real category frequency tally in plans/reports/category-coverage.md, not guessed.",
+  "reject": {
+    "$comment": "Maintenance and template bookkeeping. Matched against the category name with the 'Thể loại:' prefix already stripped. Every rejected string is counted in the coverage report so over-rejection stays visible rather than silent.",
+    "prefixes": [
+      "Bản mẫu",
+      "Bảo quản",
+      "Wikisource",
+      "Trang ",
+      "Thành viên",
+      "Tiêu bản",
+      "Trợ giúp",
+      "Tác phẩm ",
+      "Văn bản cần",
+      "Văn bản sửa đổi"
+    ],
+    "exact": [
+      "Chủ đề",
+      "Có vấn đề",
+      "Chưa hiệu đính",
+      "Bản dịch của Wikisource",
+      "Bản dịch của Wikisource không có tên bản gốc",
+      "Tác phẩm không tồn tại trang tác gia"
+    ],
+    "patterns": [
+      "^\\d+%$",
+      "^PVCC",
+      "^Creative Commons",
+      "^Tác phẩm \\d{4}$",
+      "^GFDL$",
+      "^CC-Zero$",
+      "^CC-BY"
+    ]
+  },
+  "route": {
+    "$comment": "Categories that are not subjects at all. These populate dedicated record fields in the adapter and must never surface as browsable facets.",
+    "quality": [
+      "^\\d+%$",
+      "^Chưa hiệu đính$"
+    ],
+    "license": [
+      "^PVCC",
+      "^Creative Commons",
+      "^GFDL$",
+      "^CC-Zero$",
+      "^CC-BY"
+    ]
+  },
+  "groups": {
+    "$comment": "Maps a surviving category to a top-level facet. Matching is case-insensitive substring against the NFC-normalised name. Diacritics are NOT stripped here, so 'phú' will not match 'phủ'. ORDER MATTERS: the first group with a matching term wins, so narrower legal and documentary groups are listed before broader literary ones.",
+    "Pháp luật": [
+      "luật",
+      "nghị quyết",
+      "nghị định",
+      "lệnh",
+      "hiến pháp",
+      "thông tư",
+      "quyết định",
+      "chỉ thị"
+    ],
+    "Văn kiện": [
+      "văn kiện",
+      "tuyên bố",
+      "hiệp định",
+      "công ước",
+      "điều ước",
+      "ngoại giao",
+      "thư từ"
+    ],
+    "Tôn giáo": [
+      "phật",
+      "thiên chúa",
+      "công giáo",
+      "tin lành",
+      "tôn giáo",
+      "kinh thánh",
+      "thánh kinh",
+      "gia tô",
+      "kitô",
+      "nho giáo",
+      "sấm"
+    ],
+    "Thơ ca": [
+      "thơ",
+      "ca dao",
+      "ngâm",
+      "lục bát",
+      "song thất",
+      "thất ngôn",
+      "ngũ ngôn",
+      "bát cú",
+      "tứ tuyệt",
+      "hát nói",
+      "đường luật",
+      "vè",
+      "phú",
+      "văn tế",
+      "câu đối",
+      "cổ phong"
+    ],
+    "Truyện": [
+      "truyện",
+      "cổ tích",
+      "tiểu thuyết",
+      "ngụ ngôn",
+      "thần thoại",
+      "truyền thuyết"
+    ],
+    "Diễn văn": [
+      "diễn văn",
+      "tuyên ngôn",
+      "lời kêu gọi",
+      "phát biểu"
+    ],
+    "Lịch sử": [
+      "lịch sử",
+      "biên niên",
+      "chiếu",
+      "hịch",
+      "đại cáo",
+      "sử ký",
+      "quốc sử",
+      "việt sử",
+      "nam sử",
+      "sử lược",
+      "cương mục",
+      "thực lục",
+      "bia văn miếu"
+    ],
+    "Báo chí": [
+      "báo",
+      "tạp chí",
+      "phong hóa",
+      "nam phong",
+      "phóng sự"
+    ],
+    "Nghiên cứu": [
+      "nghiên cứu",
+      "khảo cứu",
+      "từ điển",
+      "địa lý",
+      "triết học",
+      "giáo khoa"
+    ]
+  },
+  "fallback": "Khác"
+}

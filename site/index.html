@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thư viện sách — Vietnamese public-domain ebooks</title>
+<meta name="description" content="Search and download Vietnamese public-domain ebooks. Static, no backend.">
+<link rel="stylesheet" href="./style.css">
+<!-- Vendored so the page makes no third-party request at runtime. Used only to
+     strip embedded fonts from an EPUB before storing it offline. -->
+<script src="./vendor/fflate.js" defer></script>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <h1>Thư viện sách</h1>
+    <span class="muted" id="total"></span>
+  </div>
+
+  <div class="search">
+    <label class="sr-only" for="q">Search by title or author</label>
+    <input id="q" type="search" placeholder="Tìm theo tên sách hoặc tác giả…"
+           autocomplete="off" spellcheck="false" autofocus>
+  </div>
+
+  <nav class="views">
+    <button type="button" class="btn btn-quiet" data-view="search">Search</button>
+    <button type="button" class="btn btn-quiet" data-view="bookmarks">Bookmarks</button>
+    <button type="button" class="btn btn-quiet" data-view="offline">
+      Offline <span class="muted" id="offline-count"></span>
+    </button>
+  </nav>
+</header>
+
+<main class="layout">
+  <aside id="facet-panel" class="sidebar">
+    <h2>Categories</h2>
+    <ul id="facets" class="facets"></ul>
+
+    <h2>Bookmarks</h2>
+    <div class="stack">
+      <button type="button" class="btn btn-quiet" id="export">Export</button>
+      <label class="btn btn-quiet" for="import">Import</label>
+      <input type="file" id="import" accept="application/json,.json" hidden>
+    </div>
+  </aside>
+
+  <section class="content">
+    <p class="muted" id="count" aria-live="polite"></p>
+    <ul id="results" class="results"></ul>
+  </section>
+</main>
+
+<div id="overlay" class="overlay" role="dialog" aria-modal="true" aria-label="Book details" hidden></div>
+
+<footer class="foot">
+  <p class="muted">
+    Metadata from <a href="https://vi.wikisource.org/" rel="noopener">Vietnamese Wikisource</a>.
+    EPUB files are generated on demand by
+    <a href="https://ws-export.wmcloud.org/" rel="noopener">ws-export</a> and are not stored here.
+    Each work carries its own upstream licence — check the source before redistributing.
+  </p>
+</footer>
+
+<script type="module" src="./app.mjs"></script>
+</body>
+</html>
