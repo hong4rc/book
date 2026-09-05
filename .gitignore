@@ -1,0 +1,14 @@
+node_modules/
+.cache/
+.DS_Store
+*.log
+
+# Ebook binaries are NEVER committed.
+# Measured: each Wikisource EPUB is ~4.35MB, of which ~7.7MB of 8.2MB
+# uncompressed is the same embedded FreeSerif font set. Across ~6,900 works
+# that is roughly 30GB, against a GitHub limit of ~1-5GB per repo.
+# Mirroring is infeasible; this catalog stores metadata and links only.
+*.epub
+*.mobi
+*.pdf
+*.azw3

@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/hong4rc/book/schema/book.schema.json",
+  "title": "Book record",
+  "description": "One catalogued work. Emitted by scripts/adapters/*, one JSON object per line of data/books.ndjson.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "title",
+    "language",
+    "source",
+    "sourceUrl",
+    "downloads",
+    "license",
+    "updated"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1,
+      "description": "Bumped when a required field is added, forcing a full re-ingest."
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z0-9.-]+:.+$",
+      "description": "Stable primary key, '<source>:<pageTitle>'."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Display title, original diacritics preserved."
+    },
+    "author": {
+      "type": ["string", "null"],
+      "description": "Null is legitimate and preferred over a guess; Wikisource has no single author field."
+    },
+    "language": {
+      "type": "string",
+      "pattern": "^[a-z]{2}(-[A-Za-z0-9]+)*$",
+      "description": "BCP-47 tag."
+    },
+    "source": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Adapter id, e.g. 'vi.wikisource'."
+    },
+    "sourceUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "Canonical human-readable page for the work."
+    },
+    "downloads": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Built at ingest time. URLs point at the origin; no binary is stored in this repo.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["format", "url"],
+        "properties": {
+          "format": { "enum": ["epub", "pdf", "mobi", "txt"] },
+          "url": { "type": "string", "format": "uri" }
+        }
+      }
+    },
+    "categories": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Cleaned taxonomy, derived in Phase 3. Empty until then."
+    },
+    "rawCategories": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Unfiltered upstream categories, retained so the taxonomy can be re-derived offline."
+    },
+    "chapters": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Subpage count; 0 for a single-page work."
+    },
+    "quality": {
+      "type": ["string", "null"],
+      "description": "Wikisource proofread level, routed out of categories."
+    },
+    "license": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Upstream content licence, e.g. 'PD' or 'CC-BY-SA-4.0'. Not relicensed by this repo."
+    },
+    "updated": {
+      "type": "string",
+      "format": "date",
+      "description": "ISO date of last successful ingest."
+    },
+    "extra": {
+      "type": "object",
+      "description": "Unvalidated source-specific data. Absorbs new fields without a schema bump."
+    }
+  }
+}
