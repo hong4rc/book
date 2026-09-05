@@ -1,13 +1,24 @@
 ---
 phase: 6
 title: "Reader Features"
-status: in-progress
+status: completed
 priority: P2
 effort: "6h"
 dependencies: [4]
 ---
 
 # Phase 6: Reader Features
+
+## Verification status
+
+Verified in jsdom via `scripts/smoke-dom.mjs`, not in a real browser. An
+adversarial review caught three critical defects in this phase's code that unit
+tests could not see — see `plans/reports/code-review-260905-browser-runtime.md`.
+All are fixed.
+
+The EPUB repack was checked at byte level (`mimetype` is entry zero and STORED,
+per OCF) but **has not been opened in a real e-reader**, and Safari's IndexedDB
+eviction behaviour is untested. Both remain open.
 
 ## Overview
 

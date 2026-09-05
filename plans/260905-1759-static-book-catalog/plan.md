@@ -94,7 +94,7 @@ stays small enough to clone in seconds.
 | 3 | [Phase 3: Category Analysis](./phase-03-category-analysis.md) | Completed |
 | 4 | [Phase 4: Static Search Site](./phase-04-static-search-site.md) | Completed |
 | 5 | [Phase 5: CI and Publish](./phase-05-ci-and-publish.md) | Blocked (workflow scope) |
-| 6 | [Phase 6: Reader Features](./phase-06-reader-features.md) | Implemented, browser-unverified |
+| 6 | [Phase 6: Reader Features](./phase-06-reader-features.md) | Completed (DOM-verified) |
 
 ## Architecture
 
