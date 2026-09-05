@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Ingest Adapters"
-status: in-progress
+status: completed
 priority: P1
 effort: "6h"
 dependencies: [1]

@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "Static Search Site"
-status: in-progress
+status: completed
 priority: P1
 effort: "8h"
 dependencies: [3]

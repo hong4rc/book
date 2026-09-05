@@ -1,13 +1,28 @@
 ---
 phase: 5
 title: "CI and Publish"
-status: in-progress
+status: blocked
 priority: P2
 effort: "4h"
 dependencies: [4]
 ---
 
 # Phase 5: CI and Publish
+
+## Status: blocked, partially delivered
+
+**Delivered.** GitHub Pages is live at https://hong4rc.github.io/book/, serving
+from `main` at `/docs`. Deployment needs no Action at all, so `pages.yml` was
+written and then deleted as redundant.
+
+**Blocked.** `ci.yml` and `refresh.yml` are written and reviewed but cannot be
+pushed: the available token carries `gist, read:org, repo` and GitHub refuses to
+create `.github/workflows/*` without the `workflow` scope. They sit uncommitted
+in the working tree. Unblock with `gh auth refresh -s workflow`, then commit
+`.github/workflows/`.
+
+Nothing about the pipeline depends on this — `npm run refresh` performs the same
+sequence locally. What is missing is only the automation and the merge gate.
 
 ## Overview
 

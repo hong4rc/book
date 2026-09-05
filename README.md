@@ -2,6 +2,8 @@
 
 A searchable, static catalogue of Vietnamese public-domain ebooks.
 
+**Live: https://hong4rc.github.io/book/** — 6,482 works, no backend.
+
 Search by title, author, or category, then download a real EPUB. There is no
 server, no database, and no API key: the catalogue is versioned JSON in this
 repository, search runs entirely in your browser, and a scheduled GitHub Action
@@ -30,7 +32,7 @@ not a preference.
 Each Wikisource EPUB is about 4.35MB, but roughly 7.7MB of its 8.2MB
 uncompressed size is the same four embedded FreeSerif fonts, repeated in every
 file — the actual text of a work is around 370KB. Across the corpus that is
-roughly **30GB**, against a GitHub limit of about 1–5GB per repository.
+roughly **28GB**, against a GitHub limit of about 1–5GB per repository.
 Mirroring the files is not possible, so downloads are generated on demand by
 [ws-export](https://ws-export.wmcloud.org/) instead.
 
@@ -40,7 +42,7 @@ You still get a one-click download. The repository still clones in seconds.
 
 | Source | Records | Access | Content licence |
 |---|---|---|---|
-| [Vietnamese Wikisource](https://vi.wikisource.org/) | ~6,900 root works | MediaWiki API | Public domain or CC BY-SA 4.0, per work |
+| [Vietnamese Wikisource](https://vi.wikisource.org/) | 6,482 root works | MediaWiki API | Public domain or CC BY-SA 4.0, per work |
 | `data/custom/*.csv` | operator-supplied | local files | whatever the operator supplies |
 
 The pipeline uses the MediaWiki API and never scrapes HTML. It sends a
@@ -70,3 +72,18 @@ npm run build       # build the search index and the site
 ```
 
 Plans and phase documents live in [`plans/`](./plans/).
+
+## Numbers
+
+Measured on the 2026-09-05 ingest.
+
+| | |
+|---|---|
+| Works catalogued | 6,482 |
+| Main-namespace titles scanned | 15,890 (9,408 were chapter subpages) |
+| Works with a resolved author | 4,632 (71.5%) |
+| Category facets | 10, with 88.9% of works in a real subject |
+| Search index | 645KB raw, 160KB gzipped |
+| Initial page load | 172KB gzipped |
+| Search latency | 3.4ms per query |
+| Ingest | 452 API requests, 458s, zero throttling |
