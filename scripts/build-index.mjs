@@ -132,6 +132,14 @@ for (let start = 0; start < records.length; start += SHARD_SIZE) {
       license: r.license,
       isVersionsPage: r.extra?.isVersionsPage ?? false,
       related: r._related ?? [],
+      // Enrichment lives in the shard, never the index: the index is fetched on
+      // every visit, a shard only when a book is opened. ~4,600 excerpts at
+      // ~220 chars would add roughly 1MB to every page load for content the
+      // reader has not asked to see.
+      ...(r.excerpt ? { excerpt: r.excerpt } : {}),
+      ...(r.description ? { description: r.description } : {}),
+      ...(r.thumbnail ? { thumbnail: r.thumbnail } : {}),
+      ...(r.year ? { year: r.year } : {}),
     }
   }
   await writeFile(

@@ -7,6 +7,7 @@ effort: "2-3d"
 tags: [frontend, ux, wikisource, enrichment]
 created: 2026-09-06
 blockedBy: []
+blocks: [260906-0951-run-local]
 ---
 
 # site-usability-upgrade

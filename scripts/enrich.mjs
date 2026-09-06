@@ -68,14 +68,29 @@ function leadText(wikitext) {
     .replace(/^[*#:;]+/gm, '')
     .replace(/&nbsp;/g, ' ')
 
-  // First block of real text: needs letters, not just punctuation or digits.
-  const line = t
-    .split(/\n\s*\n|\n/)
+  // Accumulate the opening lines rather than taking just one.
+  //
+  // Taking a single line failed for most of this corpus. Poetry is the largest
+  // category here, and a line of Vietnamese verse is far shorter than a prose
+  // opening — so a one-line excerpt kept falling under the minimum length and
+  // being discarded. Measured: 25.9% coverage, with 2,640 of the 4,800 misses
+  // in Thơ ca alone.
+  //
+  // Joining consecutive lines is also simply the right excerpt for a poem: the
+  // opening couplet, not half of it.
+  const lines = t
+    .split(/\n/)
     .map((l) => l.trim())
-    .find((l) => l.length >= 12 && /\p{L}/u.test(l) && !/^[=|{[]/.test(l))
+    .filter((l) => l.length > 0 && /\p{L}/u.test(l) && !/^[=|{[]/.test(l))
 
-  if (!line) return null
-  const clean = line.replace(/\s+/g, ' ').trim()
+  if (lines.length === 0) return null
+  let joined = ''
+  for (const l of lines) {
+    if (joined.length >= EXCERPT_CHARS) break
+    // ' / ' is the conventional way to show a line break in quoted verse.
+    joined += (joined ? ' / ' : '') + l
+  }
+  const clean = joined.replace(/\s+/g, ' ').trim()
   if (clean.length <= EXCERPT_CHARS) return clean
   const cut = clean.slice(0, EXCERPT_CHARS)
   return cut.slice(0, cut.lastIndexOf(' ')).trimEnd() + '…'

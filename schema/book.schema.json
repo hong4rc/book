@@ -33,7 +33,10 @@
       "description": "Display title, original diacritics preserved."
     },
     "author": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "Null is legitimate and preferred over a guess; Wikisource has no single author field."
     },
     "language": {
@@ -58,21 +61,38 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["format", "url"],
+        "required": [
+          "format",
+          "url"
+        ],
         "properties": {
-          "format": { "enum": ["epub", "pdf", "mobi", "txt"] },
-          "url": { "type": "string", "format": "uri" }
+          "format": {
+            "enum": [
+              "epub",
+              "pdf",
+              "mobi",
+              "txt"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          }
         }
       }
     },
     "categories": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Cleaned taxonomy, derived in Phase 3. Empty until then."
     },
     "rawCategories": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Unfiltered upstream categories, retained so the taxonomy can be re-derived offline."
     },
     "chapters": {
@@ -81,7 +101,10 @@
       "description": "Subpage count; 0 for a single-page work."
     },
     "quality": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "Wikisource proofread level, routed out of categories."
     },
     "license": {
@@ -97,6 +120,24 @@
     "extra": {
       "type": "object",
       "description": "Unvalidated source-specific data. Absorbs new fields without a schema bump."
+    },
+    "excerpt": {
+      "type": "string",
+      "description": "The work's opening lines, truncated. NOT a summary - no summary source exists for this corpus. Verse line breaks are shown as ' / '."
+    },
+    "description": {
+      "type": "string",
+      "description": "Wikidata item description (vi, else en). Present for ~5% of works."
+    },
+    "thumbnail": {
+      "type": "string",
+      "format": "uri",
+      "description": "Real cover image where one exists (~0.6%). Most works have none; the site generates a typographic cover instead."
+    },
+    "year": {
+      "type": "integer",
+      "minimum": 1000,
+      "description": "Publication year, parsed from the existing 'Tác phẩm YYYY' category. No API call needed."
     }
   }
 }
