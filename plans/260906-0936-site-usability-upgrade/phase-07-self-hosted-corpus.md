@@ -24,18 +24,12 @@ The original design linked rather than mirrored, on the measured ground that
 **about the wrong thing**: 97% of an EPUB here is four repeated embedded fonts.
 The literature itself is small.
 
-Measured over 60 random works:
+The earlier conclusion was an artefact of measuring the packaging instead of the
+content.
 
-| | Per work | 6,482 works | + 9,408 chapters |
-|---|---|---|---|
-| Raw wikitext | 3.3 KB | 21 MB | — |
-| Gzipped | 1.3 KB | **8 MB** | **~20 MB** |
-
-**~20MB for the complete corpus.** That fits trivially. The earlier conclusion
-was an artefact of measuring the packaging instead of the content.
-
-**Estimate corrected by measurement (2026-09-06).** The enrichment run fetched
-every work, so the full corpus was measurable rather than projected:
+**Measured across all 6,482 works (2026-09-06).** An initial projection from 60
+samples put this at 21MB raw / 8MB gzipped. The enrichment run then fetched every
+work, making the real figure measurable:
 
 | | Projected (60 samples) | **Actual (all 6,482)** |
 |---|---|---|
