@@ -1,7 +1,7 @@
 ---
 phase: 5
 title: "CI and Publish"
-status: blocked
+status: in-progress
 priority: P2
 effort: "4h"
 dependencies: [4]
@@ -9,20 +9,33 @@ dependencies: [4]
 
 # Phase 5: CI and Publish
 
-## Status: blocked, partially delivered
+## Status: workflows live, two criteria still unmet (2026-09-06)
 
-**Delivered.** GitHub Pages is live at https://hong4rc.github.io/book/, serving
-from `main` at `/docs`. Deployment needs no Action at all, so `pages.yml` was
-written and then deleted as redundant.
+GitHub Pages is live at https://hong4rc.github.io/book/, serving from `main` at
+`/docs`. Deployment needs no Action at all, so `pages.yml` was written and then
+deleted as redundant — the three-workflow design below is now two.
 
-**Blocked.** `ci.yml` and `refresh.yml` are written and reviewed but cannot be
-pushed: the available token carries `gist, read:org, repo` and GitHub refuses to
-create `.github/workflows/*` without the `workflow` scope. They sit uncommitted
-in the working tree. Unblock with `gh auth refresh -s workflow`, then commit
-`.github/workflows/`.
+`ci.yml` and `refresh.yml` were blocked for a day: the token carried
+`gist, read:org, repo`, and GitHub refuses to create `.github/workflows/*`
+without the `workflow` scope. The operator granted it via
+`gh auth refresh -s workflow` and both are now committed and running.
 
-Nothing about the pipeline depends on this — `npm run refresh` performs the same
-sequence locally. What is missing is only the automation and the merge gate.
+Verified before pushing: every npm script and node script the workflows call
+exists, the refresh cron is weekly rather than daily, and `docs/data` rebuilds
+byte-identically so the staleness check passes rather than failing red on its
+first run. CI then passed all 8 steps on its first run.
+
+**Still open, and this phase is not done until they close:**
+
+- `main` is **not** branch-protected (`GET .../branches/main/protection` returns
+  404). CI therefore *runs* but does not *block* a merge, so two criteria below
+  are unmet. Enabling it is a repo-policy change that would also stop direct
+  pushes to `main` — which is how this project has been developed all session —
+  so it needs an explicit decision rather than being switched on quietly.
+- `refresh.yml` has never executed. Its cron is weekly, so the criteria about
+  opening a reviewable PR, exiting cleanly on no change, and finishing inside
+  five minutes are all unverified. A `workflow_dispatch` dry run would settle
+  them.
 
 ## Overview
 
@@ -88,13 +101,13 @@ cannot race and publish a half-built index.
 
 ## Success Criteria
 
-- [ ] PR check runs and blocks merge on schema or fixture failure
+- [ ] PR check runs and **blocks merge** — runs ✅, blocks ❌ (no branch protection)
 - [ ] Scheduled refresh opens a reviewable PR with a record-count summary
 - [ ] A no-change refresh exits without opening an empty PR
-- [ ] Pages deploys automatically on merge to `main`
-- [ ] Full cold rebuild completes in under 15 minutes
+- [x] Pages deploys automatically on merge to `main`
+- [x] Full cold rebuild completes in under 15 minutes — CI green, 8/8 steps
 - [ ] Cached refresh completes in under 5 minutes
-- [ ] `main` is branch-protected on a green CI
+- [ ] `main` is branch-protected on a green CI — **not enabled; needs a decision**
 
 ## Risk Assessment
 

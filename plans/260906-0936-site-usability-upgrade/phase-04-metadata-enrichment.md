@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "Metadata Enrichment"
-status: pending
+status: in-progress
 priority: P2
 effort: "5h"
 dependencies: [2]
@@ -103,14 +103,27 @@ is ~1.3MB of excerpts — fine spread across 33 shards, fatal in the index.
    description as a subtitle when present; year in the metadata line.
 8. Re-run validate, build, and both smoke tests; confirm index size held.
 
+## Status: data landed, rendering not built
+
+The ingest half shipped (commit `5ebd4db`). The UI half — steps 7 below — was
+never written, so none of this is visible to a reader yet. Marked in-progress
+rather than done.
+
+Two criteria will not be met as written:
+
+- **≥95% excerpt coverage: actual 71.2%.** 95% of the 1,868 misses have no
+  proofread status and 292 are contents pages for multi-part works, i.e. pages
+  with no opening to show. The target was wrong, not the implementation.
+- Rendering criteria depend on the detail panel, which Phase 3 rebuilds.
+
 ## Success Criteria
 
-- [ ] ≥95% of works have a non-empty, non-heading excerpt
+- [ ] ~~≥95%~~ **71.2%** of works have a non-empty, non-heading excerpt (target revised; remainder are thin/contents pages)
 - [ ] Excerpt is labelled as an excerpt; the word "Tóm tắt" appears nowhere for it
-- [ ] `year` populated for ≥35% with zero extra API calls
+- [x] `year` populated for ≥35% with zero extra API calls — **47.8%**
 - [ ] Wikidata description shown where present, absent cleanly where not
-- [ ] Search index stays under 700KB raw; initial load under 500KB gzipped
-- [ ] Ingest completes with zero 429s
+- [x] Search index stays under 700KB raw; initial load under 500KB gzipped — **663KB / 186KB**
+- [x] Ingest completes with zero 429s
 
 ## Risk Assessment
 

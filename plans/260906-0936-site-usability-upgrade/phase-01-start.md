@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Fix Null Rendering"
-status: pending
+status: completed
 priority: P1
 effort: "1h"
 dependencies: []

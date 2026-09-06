@@ -95,10 +95,10 @@ No amount of tuning fixes this — the data does not exist.
 
 | # | Phase | Status |
 |---|-------|--------|
-| 1 | [Phase 1: Fix Null Rendering](./phase-01-start.md) | Pending |
+| 1 | [Phase 1: Fix Null Rendering](./phase-01-start.md) | Completed |
 | 2 | [Phase 2: Full List And Pagination](./phase-02-full-list-and-pagination.md) | Pending |
 | 3 | [Phase 3: Layout Redesign](./phase-03-layout-redesign.md) | Pending |
-| 4 | [Phase 4: Metadata Enrichment](./phase-04-metadata-enrichment.md) | Pending |
+| 4 | [Phase 4: Metadata Enrichment](./phase-04-metadata-enrichment.md) | Completed |
 | 5 | [Phase 5: Reviews Decision](./phase-05-reviews-decision.md) | Decided: dropped |
 | 6 | [Phase 6: In Browser Reader](./phase-06-in-browser-reader.md) | Pending |
 | 7 | [Phase 7: Self Hosted Corpus](./phase-07-self-hosted-corpus.md) | Pending |
