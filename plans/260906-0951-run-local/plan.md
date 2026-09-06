@@ -1,7 +1,10 @@
 ---
 title: "run-local"
 description: "Run the whole catalogue on your own machine with no install step, no network, and no third-party service."
-status: pending
+status: superseded
+# Superseded 2026-09-06 by 260906-1043-epub-first-site. The request became
+# "do the best for web on github, only that make sure i can load epub" -- a
+# local dev server and PWA are explicitly not that.
 priority: P1
 effort: "1-2d"
 tags: [offline, local-first, pwa, distribution]

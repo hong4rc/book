@@ -42,19 +42,44 @@ only.
 ### Sanitize anyway
 
 The probe found no `<script>`, but that is an observation about one page, not a
-guarantee — and injecting remote HTML is the classic XSS vector. Sanitize with an
-**allowlist**, never a blocklist:
+guarantee — and injecting remote HTML is the classic XSS vector. Anyone can edit
+vi.wikisource.org, so the input is untrusted by definition.
+
+**Allowlist tags AND attributes.** An earlier draft of this section allowlisted
+tags but then *blocklisted* attributes ("strip `on*` and non-https `href`/`src`")
+while calling itself an allowlist. Red-team review found everything unnamed
+survives that rule:
+
+| Attribute | What it does if it survives |
+|---|---|
+| `srcset` / `imagesrcset` | loads an arbitrary URL — it is not `src`, so a src-only rule misses it |
+| `style` | `url()`, `@import`, `background-image` all issue network requests; `position:fixed` enables clickjacking over our own buttons |
+| `ping` | fires a POST to an arbitrary URL on click |
+| `formaction` | overrides form submission target |
+| `id` / `name` | **DOM clobbering** — the app resolves `#overlay`, `#results`, `#count` by id; injected content with a colliding id shadows the real node |
+| `target` | reverse tabnabbing on any already-https upstream link |
+
+So the rule is a **per-tag attribute allowlist**, everything else dropped:
+
+```
+a       -> href, title          img  -> src, alt, width, height
+td, th  -> colspan, rowspan      *    -> (nothing else; no id, name, style, class)
+```
 
 - Allowed tags: the observed structural set (`p, div, span, a, b, i, br, ul, ol,
   li, dl, dd, dt, figure, figcaption, img, h1-h6, table, tr, td, th, sup, small`).
-- Strip every `on*` attribute and any `href`/`src` whose scheme is not
-  `https:` (kills `javascript:` and `data:`).
-- Rewrite protocol-relative `//upload.wikimedia.org` to `https:`.
-- Internal `/wiki/...` links: resolve to our own book page when the target is in
-  the catalogue, otherwise send to Wikisource with `rel="noopener"`.
+- Any `href`/`src` whose scheme is not `https:` is dropped (kills `javascript:`
+  and `data:`); protocol-relative `//upload.wikimedia.org` is rewritten to https.
+- `rel="noopener"` on **every** outbound `<a>`, not only the rewritten ones.
+- Internal `/wiki/...` links resolve to our own book page when the target is in
+  the catalogue, otherwise to Wikisource.
 
 Build the DOM with `DOMParser` and walk it, rather than regex over a string —
 regex sanitizers are a well-known source of bypasses.
+
+The hostile-input suite must cover `srcset`, `style`, `ping`, `formaction` and
+`id`-clobbering by name. A reviewer reading the old spec would not have thought
+to test any of them, which is exactly why they were missing.
 
 ### Licensing is a hard requirement, not a footnote
 

@@ -1,7 +1,10 @@
 ---
 title: "site-usability-upgrade"
 description: "Fix a rendering bug affecting nearly every book, show the whole catalogue instead of 100 results, redesign the layout around generated covers, and add the enrichment that Wikisource can actually supply."
-status: pending
+status: partially-superseded
+# Phases 1, 4, 5 landed or were decided. Phases 2, 3, 6, 7 are superseded by
+# 260906-1043-epub-first-site: self-hosting EPUBs replaces the 370MB HTML
+# corpus, and reading a local EPUB replaces the live-fetch reader.
 priority: P1
 effort: "2-3d"
 tags: [frontend, ux, wikisource, enrichment]

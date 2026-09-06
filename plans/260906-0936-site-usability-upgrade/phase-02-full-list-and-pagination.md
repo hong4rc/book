@@ -33,12 +33,26 @@ not solvable.
 scan over 6,482 records is ~2.4-3.8ms. Rendering 6,482 `<li>` elements is what
 would hurt. So the cap moves from the *query* to the *rendering*.
 
-**Chosen approach: "Load more" with a windowed list.**
+**Chosen approach: "Load more". Nothing else.**
 
 - Render a page of 100, append the next 100 on demand.
-- Keep the rendered window bounded (e.g. 600 rows) by dropping rows off the top
-  as the user goes further, so the DOM never grows without limit.
 - The offset lives in the URL hash so a position is shareable and survives back.
+
+**Windowed row-trimming was cut** (red team, 2026-09-06). The earlier draft also
+bounded the rendered DOM at ~600 rows by dropping rows off the top — then its
+own risk section conceded the fix might be *"raise the window cap until the jump
+disappears"*, which is "do not trim". It rejected virtual scrolling for causing
+scroll-anchoring bugs and then hand-rolled the same problem. Nobody asked for a
+bounded DOM; the request was to see the full list. Ship load-more, measure the
+real cost at 6,482 rows, and add bounding only if a measurement demands it.
+
+**`search()` keeps its signature.** The earlier draft threaded an `offset`
+through it. It already builds and sorts the complete result array and only
+slices at the end, so paging is `results.slice(offset, offset + limit)` in the
+caller. More to the point, two of the three paginated lists never call `search()`
+at all — bookmarks and offline take a different branch — so an offset parameter
+could not have been the shared windowing path the draft claimed. Changing it
+would have churned 7 test call sites for a slice the caller can do itself.
 
 Rejected alternatives, with reasons:
 
@@ -48,8 +62,18 @@ Rejected alternatives, with reasons:
 | Numbered pages | Reads as a database admin tool, and fights the incremental-search feel |
 | Full virtual scroll | Correct at millions of rows; here it costs scroll-anchoring and a11y bugs for a list that is only ~6.5k |
 
-An alphabetical index (jump to a letter) is the natural companion for browsing
-without a query, and is cheap because the catalogue is already sorted by id.
+**Browse order must be decided first.** An alphabetical index sounds cheap
+because `books.ndjson` is id-sorted — but nothing ever *renders* it in that
+order. With an empty query, `search()` scores each record `-title.length` and
+sorts by score, so the no-query list is **shortest-titles-first**. Dropping an
+A-Z index onto that lands the reader in a length-ordered sequence where
+consecutive rows have unrelated initials.
+
+So this phase must first make the no-query list sort by folded title, and assert
+that ordering in a test. Only then does a letter index mean anything.
+
+Whether the A-Z index ships at all is an open question for the operator: the
+request was "show full list", and load-more alone satisfies it.
 
 ## Related Code Files
 
