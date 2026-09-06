@@ -88,6 +88,7 @@ No amount of tuning fixes this — the data does not exist.
 | 5 | Opening excerpt and Wikidata description where available | P2 |
 | 6 | An explicit, recorded decision on reviews | P3 |
 | 7 | Read a book in the browser, no backend | P1 |
+| 8 | Depend on no external service at runtime | P1 |
 
 ## Phases
 
@@ -99,16 +100,23 @@ No amount of tuning fixes this — the data does not exist.
 | 4 | [Phase 4: Metadata Enrichment](./phase-04-metadata-enrichment.md) | Pending |
 | 5 | [Phase 5: Reviews Decision](./phase-05-reviews-decision.md) | Decided: dropped |
 | 6 | [Phase 6: In Browser Reader](./phase-06-in-browser-reader.md) | Pending |
+| 7 | [Phase 7: Self Hosted Corpus](./phase-07-self-hosted-corpus.md) | Pending |
 
 Phases 1 and 2 are independent and can ship immediately. Phases 3 and 6 depend
 on 1. Phase 4 requires a re-ingest. Phase 5 was a decision gate and is closed:
 **reviews dropped**, keeping the catalogue a pure static artefact.
 
-Phase 6 (in-browser reader) was added after the plan opened, on request. It is
-P1 because it is the largest usefulness gain available, and it was verified
-feasible first: Wikimedia serves `action=parse` with
-`access-control-allow-origin: *`, so the text can be fetched straight from
-GitHub Pages with no backend.
+Phase 6 (in-browser reader) was added after the plan opened, on request, and
+verified feasible first: Wikimedia serves `action=parse` with
+`access-control-allow-origin: *`.
+
+Phase 7 (self-hosted corpus) then supersedes Phase 6's *source*: rather than
+fetching from Wikimedia at read time, the text is stored in this repo and read
+locally. Requested as "i dont want depend on any else", and measurement showed
+it is possible — the complete corpus is roughly **20MB gzipped**, not the 28GB
+the original design assumed. That 28GB figure measured EPUB packaging, of which
+97% is repeated embedded fonts; the literature itself is small. Phase 7 also
+moves EPUB generation into the browser, removing the last runtime dependency.
 
 ## Success Criteria
 
