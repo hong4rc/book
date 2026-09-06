@@ -14,9 +14,10 @@
     "ingest": "node scripts/ingest.mjs",
     "facets": "node scripts/derive-facets.mjs",
     "build": "node scripts/build-index.mjs",
-    "refresh": "npm run ingest && npm run facets && npm run validate && npm run build",
+    "refresh": "npm run ingest && npm run enrich && npm run facets && npm run validate && npm run build",
     "serve": "npx --yes serve docs",
-    "smoke": "node scripts/smoke-search.mjs && node scripts/smoke-dom.mjs"
+    "smoke": "node scripts/smoke-search.mjs && node scripts/smoke-dom.mjs",
+    "enrich": "node scripts/enrich.mjs"
   },
   "devDependencies": {
     "ajv": "^8.17.1",

@@ -167,7 +167,10 @@ try {
   console.warn(`warning: could not vendor fflate (${err.code}); offline font-stripping will be disabled`)
 }
 
-const indexBytes = JSON.stringify(index).length
+// Byte length, not character count: Vietnamese is multi-byte in UTF-8, so
+// .length under-reports the real file size by ~13% and made a size budget
+// look met when it was not.
+const indexBytes = Buffer.byteLength(JSON.stringify(index), 'utf8')
 console.log(`index.json : ${(indexBytes / 1024).toFixed(0)}KB, ${records.length} books`)
 console.log(`shards     : ${shardCount} files of up to ${SHARD_SIZE}`)
 console.log(`categories : ${categoryNames.length}`)

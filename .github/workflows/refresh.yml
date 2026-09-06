@@ -44,6 +44,13 @@ jobs:
           CATALOG_UA: ${{ vars.CATALOG_UA }}
         run: node scripts/ingest.mjs
 
+      # Must run after ingest and before facets: ingest carries enrichment
+      # forward, but only enrich can produce it for newly-added works.
+      - name: Enrich (excerpt, year, description, thumbnail)
+        env:
+          CATALOG_UA: ${{ vars.CATALOG_UA }}
+        run: node scripts/enrich.mjs
+
       - name: Derive facets
         run: node scripts/derive-facets.mjs
 
