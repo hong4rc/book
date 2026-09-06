@@ -1,0 +1,94 @@
+name: Refresh catalogue
+
+on:
+  schedule:
+    # Weekly, not daily: the upstream corpus moves slowly and this is someone
+    # else's volunteer-funded infrastructure.
+    - cron: '17 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # Keyed by week so a refresh re-fetches only what actually changed.
+      - name: Restore API cache
+        uses: actions/cache@v4
+        with:
+          path: .cache
+          key: wikisource-${{ github.run_id }}
+          restore-keys: wikisource-
+
+      - name: Ingest
+        env:
+          # Wikimedia's User-Agent policy wants a real contact route. This is a
+          # repo variable, not a secret: it is public by design.
+          CATALOG_UA: ${{ vars.CATALOG_UA }}
+        run: node scripts/ingest.mjs
+
+      - name: Derive facets
+        run: node scripts/derive-facets.mjs
+
+      - name: Validate
+        run: node scripts/validate.mjs
+
+      - name: Build site payload
+        run: node scripts/build-index.mjs
+
+      - name: Summarise changes
+        id: diff
+        run: |
+          if git diff --quiet -- data docs/data; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No catalogue changes; skipping pull request."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            {
+              echo 'summary<<EOF'
+              echo "Records: $(wc -l < data/books.ndjson)"
+              echo
+              echo '```'
+              git diff --stat -- data docs/data | tail -20
+              echo '```'
+              echo EOF
+            } >> "$GITHUB_OUTPUT"
+          fi
+
+      # A pull request, never a direct push: an ingest that half-fails looks
+      # exactly like a legitimate mass deletion, and that must be reviewed by a
+      # human rather than committed automatically. ingest.mjs also refuses to
+      # write when the record count drops more than 5%.
+      - name: Open pull request
+        if: steps.diff.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: refresh/catalogue
+          title: 'chore: refresh catalogue from vi.wikisource'
+          commit-message: 'chore: refresh catalogue from vi.wikisource'
+          body: |
+            Automated weekly refresh.
+
+            ${{ steps.diff.outputs.summary }}
+
+            Review the record-count change before merging. A large drop usually
+            means a partial API failure rather than real deletions upstream.
+          labels: data
+          delete-branch: true

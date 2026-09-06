@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # Folding first: it is the cheapest check and the likeliest silent
+      # regression, since broken folding still "works", just stops matching.
+      - name: Vietnamese folding fixtures
+        run: node scripts/check-fixtures.mjs
+
+      - name: Validate catalogue schema, uniqueness, and sort order
+        run: node scripts/validate.mjs
+
+      - name: Build site payload
+        run: node scripts/build-index.mjs
+
+      # Boots the real page in a DOM. This exists because its absence let a
+      # completely non-functional site ship while every unit test passed.
+      - name: Search and DOM smoke tests
+        run: npm run smoke
+
+      # The site is served straight from the repo, so generated output must be
+      # committed. A diff here means someone edited data without rebuilding.
+      - name: Check docs/data is up to date
+        run: |
+          if ! git diff --quiet -- docs/data; then
+            echo "::error::docs/data is stale. Run 'npm run build' and commit the result."
+            git diff --stat -- docs/data
+            exit 1
+          fi
