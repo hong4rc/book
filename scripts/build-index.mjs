@@ -35,6 +35,18 @@ records.forEach((r, i) => { r._ord = i })
 const categoryNames = [...new Set(records.flatMap((r) => r.categories ?? []))].sort()
 const categoryIndex = new Map(categoryNames.map((c, i) => [c, i]))
 
+// Refuse to build a catalogue with no categories. `categories` is DERIVED by
+// derive-facets.mjs, so running ingest on its own resets it to [] on every
+// record -- and the resulting build looks healthy while shipping a dead facet
+// sidebar. That exact sequence reached production once.
+if (categoryNames.length === 0 && records.length > 0) {
+  console.error(
+    'FAILED: no categories on any record. ingest.mjs resets them; run ' +
+    '`npm run facets` before building, or use `npm run refresh` for the full chain.',
+  )
+  process.exit(1)
+}
+
 /**
  * Related works, precomputed so the browser does no corpus-wide work.
  *

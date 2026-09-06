@@ -7,6 +7,7 @@
  * extra request.
  */
 import { el, appendAll } from './dom.mjs'
+import { coverSvg } from './cover.mjs'
 import { getIndex } from './search.mjs'
 import * as bookmarks from './bookmarks.mjs'
 import * as offline from './offline.mjs'
@@ -173,15 +174,44 @@ export async function renderDetail(ord, { onOpen, onClose, onOfflineChange }) {
 
   const meta = []
   if (book.author) meta.push(book.author)
+  if (book.year) meta.push(String(book.year))
   if (book.chapters > 0) meta.push(`${book.chapters} chapters`)
   if (book.quality) meta.push(`proofread ${book.quality}`)
   meta.push(book.license)
 
+  // Cover: generated, because real art exists for ~0.3% of this corpus. A real
+  // thumbnail replaces it when one exists rather than being thrown away.
+  const art = el('div', { className: 'cover-wrap' })
+  if (book.thumbnail && /^https:/.test(book.thumbnail)) {
+    art.append(el('img', { className: 'cover', src: book.thumbnail, alt: '', loading: 'lazy' }))
+  } else {
+    art.innerHTML = coverSvg({ title: book.title, author: book.author, category: book.categories?.[0] })
+  }
+
+  const head = el('div', { className: 'detail-head' }, [
+    art,
+    el('div', {}, [
+      el('h2', { textContent: book.title }),
+      el('p', { className: 'muted', textContent: meta.join(' · ') }),
+      book.description ? el('p', { className: 'muted', textContent: book.description }) : null,
+    ]),
+  ])
+
+  // Labelled as an excerpt, never as "Tóm tắt". These are the work's opening
+  // lines; no summary source exists for this corpus (measured 0% usable from
+  // the extracts API), and calling them a summary would misdescribe them.
+  const excerpt = book.excerpt
+    ? el('div', { className: 'excerpt' }, [
+        el('span', { className: 'excerpt-label', textContent: 'Trích đoạn mở đầu' }),
+        el('span', { textContent: book.excerpt }),
+      ])
+    : null
+
   appendAll(
     panel,
     close,
-    el('h2', { textContent: book.title }),
-    el('p', { className: 'muted', textContent: meta.join(' · ') }),
+    head,
+    excerpt,
     book.isVersionsPage
       ? el('p', { className: 'notice', textContent: 'This is a versions page listing several editions of the work.' })
       : null,

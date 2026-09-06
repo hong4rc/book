@@ -59,10 +59,27 @@ a { color: inherit; }
 .search { flex: 1 1 18rem; }
 
 #q {
-  width: 100%; padding: .55rem .7rem;
-  border: 1px solid var(--line); border-radius: .4rem;
-  background: var(--paper); color: inherit; font-size: 1rem;
+  width: 100%;
+  padding: .7rem .9rem .7rem 2.4rem;
+  border: 1px solid var(--line);
+  border-radius: 0;                 /* editorial: rules, not rounded chrome */
+  border-bottom-width: 2px;
+  background: var(--paper) no-repeat .8rem 50%;
+  background-size: 1rem;
+  /* Inline magnifier, so the field reads as search without an icon font or
+     an emoji. currentColor keeps it correct in both themes. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236a6459' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-4-4'/%3E%3C/svg%3E");
+  color: inherit;
+  font: inherit; font-size: 1.05rem;
+  transition: border-color .15s ease;
 }
+#q::placeholder { color: var(--muted); opacity: .8; }
+#q:focus {
+  outline: none;
+  border-color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+#q:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
 .views { display: flex; gap: .35rem; flex-wrap: wrap; }
 
@@ -91,19 +108,26 @@ a { color: inherit; }
 
 /* --------------------------------------------------------------- results */
 
-.results { list-style: none; margin: .25rem 0 0; padding: 0; display: grid; gap: 1px; }
-
-.result {
-  display: flex; flex-direction: column; gap: .1rem;
-  padding: .6rem .7rem;
-  text-decoration: none;
-  border: 1px solid transparent;
-  border-radius: .35rem;
+.results {
+  list-style: none; margin: .5rem 0 0; padding: 0;
+  display: grid;
+  /* auto-fill + minmax: one column at 360px through four on a wide screen,
+     with no breakpoint list to keep in sync. */
+  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+  gap: 1.1rem .9rem;
 }
 
-.result:hover { background: var(--panel); }
-.result:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
-.result-title { font-weight: 600; }
+.card { min-width: 0; }
+
+.card-link {
+  display: flex; flex-direction: column; gap: .45rem;
+  text-decoration: none; color: inherit;
+  border-radius: .2rem;
+}
+
+
+.card-link:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+
 
 .empty, .notice { padding: .75rem; color: var(--muted); }
 .notice { color: var(--accent); }
@@ -187,3 +211,64 @@ a { color: inherit; }
   padding: 1rem; margin-top: 2rem;
 }
 .foot p { max-width: 60rem; margin: 0 auto; }
+
+/* ------------------------------------------------------------------ cards */
+
+.cover-wrap {
+  aspect-ratio: 100 / 140;
+  border: 1px solid var(--line);
+  overflow: hidden;
+  background: var(--panel);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.cover { display: block; width: 100%; height: 100%; }
+
+.card-link:hover .cover-wrap { transform: translateY(-2px); }
+.card-link:focus-visible .cover-wrap { transform: translateY(-2px); }
+
+/* Motion is decorative here, so it goes away entirely when asked. */
+@media (prefers-reduced-motion: reduce) {
+  .cover-wrap { transition: none; }
+  .card-link:hover .cover-wrap,
+  .card-link:focus-visible .cover-wrap { transform: none; }
+}
+
+.card-title {
+  font-weight: 600; font-size: .88rem; line-height: 1.3;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-author {
+  font-size: .78rem; color: var(--muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.more {
+  display: block; margin: 1.75rem auto 0;
+  padding: .6rem 1.4rem; font-size: .9rem;
+}
+
+#count { font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+
+/* Detail panel cover sits beside the metadata above the narrow breakpoint. */
+.detail-head { display: flex; gap: 1.1rem; align-items: flex-start; }
+.detail-head .cover-wrap { flex: 0 0 7rem; }
+.detail-head > div { min-width: 0; }
+
+@media (max-width: 30rem) {
+  .detail-head { display: block; }
+  .detail-head .cover-wrap { width: 6rem; margin-bottom: .8rem; }
+}
+
+.excerpt {
+  margin: 1rem 0 0; padding: .75rem .9rem;
+  background: var(--paper); border-left: 2px solid var(--accent);
+  font-size: .92rem; line-height: 1.65;
+}
+.excerpt-label {
+  display: block; margin-bottom: .3rem;
+  font-size: .7rem; letter-spacing: .09em; text-transform: uppercase;
+  color: var(--muted);
+}

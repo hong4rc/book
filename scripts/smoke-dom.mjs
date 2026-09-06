@@ -96,10 +96,12 @@ for (let i = 0; i < 100 && $('#results').children.length === 0; i++) {
 check('no uncaught errors during boot', errors.length === 0, errors.join('; '))
 check('results rendered', $('#results').children.length > 0,
   `#results has ${$('#results').children.length} children`)
-check('result count line populated', /result/.test($('#count').textContent),
+check('result count line populated', /\d/.test($('#count').textContent),
   `#count = ${JSON.stringify($('#count').textContent)}`)
 check('book total shown in header', /\d/.test($('#total').textContent),
   `#total = ${JSON.stringify($('#total').textContent)}`)
+// Non-empty facets, guarding the regression where a standalone ingest reset
+// every record's derived categories and shipped a dead sidebar.
 check('category facets rendered', $('#facets').children.length >= 5,
   `${$('#facets').children.length} facets`)
 check('overlay starts hidden', $('#overlay').hidden === true)
@@ -119,7 +121,7 @@ q.value = 'truyen kieu'
 q.dispatchEvent(new window.Event('input', { bubbles: true }))
 await new Promise((r) => setTimeout(r, 50))
 
-const firstResult = $('#results .result-title')
+const firstResult = $('#results .card-title')
 check('typing an accentless query returns results', firstResult !== null)
 check('accentless query ranks the accented title first',
   firstResult?.textContent === 'Truyện Kiều',

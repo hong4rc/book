@@ -9,12 +9,13 @@
  * their failures are contained rather than allowed to reach the page.
  */
 import { el, appendAll } from './dom.mjs'
+import { coverSvg } from './cover.mjs'
 import { loadIndex, getIndex, search } from './search.mjs'
 import { renderDetail } from './book.mjs'
 import * as bookmarks from './bookmarks.mjs'
 import * as offline from './offline.mjs'
 
-const RESULT_LIMIT = 100
+const PAGE = 60   // rows appended per 'load more'
 
 const $ = (sel) => document.querySelector(sel)
 
@@ -68,55 +69,82 @@ function writeHash({ replace = false } = {}) {
 /* ---------------------------------------------------------------- render  */
 
 function resultRow(ord) {
-  const entry = getIndex().books[ord]
+  const index = getIndex()
+  const entry = index.books[ord]
   if (!entry) return null // stale bookmark, or an id from a different catalogue
-  const [title, author] = entry
-  return el('li', {}, el('a', { href: `#book/${ord}`, className: 'result' }, [
-    el('span', { className: 'result-title', textContent: title }),
-    author ? el('span', { className: 'muted', textContent: author }) : null,
+  const [title, author, , catIds] = entry
+  const category = index.categories[catIds?.[0]] ?? 'Khác'
+
+  const art = el('div', { className: 'cover-wrap' })
+  // Trusted input: coverSvg escapes its own text and the values come from our
+  // own index, never from remote HTML.
+  art.innerHTML = coverSvg({ title, author, category })
+
+  return el('li', { className: 'card' }, el('a', { href: `#book/${ord}`, className: 'card-link' }, [
+    art,
+    el('div', { className: 'card-body' }, [
+      el('span', { className: 'card-title', textContent: title }),
+      el('span', { className: 'card-author', textContent: author ?? 'Khuyết danh' }),
+    ]),
   ]))
+}
+
+let shown = []          // ordinals currently rendered
+let matched = []        // every ordinal matching the current query/filters
+
+/** Recompute the match set. Called when query, facets, or view change. */
+function recomputeMatches() {
+  if (state.view === 'bookmarks') matched = bookmarks.list()
+  else if (state.view === 'offline') matched = offlineOrdinals
+  else matched = search(state.query, { categories: state.categories, limit: Infinity }).ordinals
+  shown = []
+}
+
+/**
+ * Append the next page.
+ *
+ * Appends rather than re-rendering: the earlier design capped every list at 100
+ * and left 6,382 works unreachable by browsing. There is deliberately no
+ * windowed row-trimming — dropping rows off the top to bound the DOM
+ * reintroduces the scroll-anchoring problem it was meant to avoid.
+ */
+function renderMore(count = PAGE) {
+  const list = $('#results')
+  const next = matched.slice(shown.length, shown.length + count)
+  for (const ord of next) {
+    const row = resultRow(ord)
+    if (row) list.append(row)
+  }
+  shown = matched.slice(0, shown.length + next.length)
+  paintCount()
+}
+
+function paintCount() {
+  const total = matched.length
+  $('#count').textContent = total === 0 ? '' : `${shown.length} / ${total.toLocaleString()}`
+  const more = total - shown.length
+  const btn = $('#more')
+  btn.hidden = more <= 0
+  btn.textContent = more > 0 ? `Xem thêm (còn ${more.toLocaleString()})` : ''
 }
 
 function renderResults() {
   const list = $('#results')
   list.textContent = ''
+  recomputeMatches()
 
-  let ordinals
-  let total
-
-  if (state.view === 'bookmarks' || state.view === 'offline') {
-    const all = state.view === 'bookmarks' ? bookmarks.list() : offlineOrdinals
-    total = all.length
-    ordinals = all.slice(0, RESULT_LIMIT)
-  } else {
-    ;({ ordinals, total } = search(state.query, {
-      categories: state.categories,
-      limit: RESULT_LIMIT,
-    }))
+  if (matched.length === 0) {
+    list.append(el('li', { className: 'empty' }, [
+      state.view === 'bookmarks'
+        ? 'Chưa có sách nào được đánh dấu.'
+        : state.view === 'offline'
+          ? 'Chưa lưu sách nào để đọc ngoại tuyến.'
+          : 'Không tìm thấy. Thử ít từ hơn, hoặc bỏ bớt bộ lọc.',
+    ]))
+    paintCount()
+    return
   }
-
-  const rows = ordinals.map(resultRow).filter(Boolean)
-
-  if (rows.length === 0) {
-    list.append(
-      el('li', { className: 'empty' }, [
-        state.view === 'bookmarks'
-          ? 'No bookmarks yet. Open a book and choose Bookmark.'
-          : state.view === 'offline'
-            ? 'No books saved offline yet.'
-            : 'No matches. Try fewer words, or clear the category filters.',
-      ]),
-    )
-  } else {
-    for (const row of rows) list.append(row)
-  }
-
-  $('#count').textContent =
-    total === 0
-      ? ''
-      : total > rows.length
-        ? `${rows.length} of ${total} results`
-        : `${total} result${total === 1 ? '' : 's'}`
+  renderMore()
 }
 
 function renderFacets() {
@@ -279,6 +307,13 @@ async function main() {
       route()
     })
   }
+
+  $('#more').addEventListener('click', () => {
+    renderMore()
+    // Keep focus on the button so repeated keyboard activation works; it moves
+    // down the page as rows are appended, which is the expected behaviour.
+    $('#more').focus()
+  })
 
   $('#export').addEventListener('click', () => {
     const blob = new Blob([bookmarks.exportJson()], { type: 'application/json' })
