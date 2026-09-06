@@ -34,9 +34,25 @@ Measured over 60 random works:
 **~20MB for the complete corpus.** That fits trivially. The earlier conclusion
 was an artefact of measuring the packaging instead of the content.
 
-Sample caveat: 60 works with a heavy tail (*Truyện Kiều* is 200KB+ of wikitext),
-so the true mean is probably higher than 3.3KB. Even at 3x, ~60MB is fine. The
-implementation records the real total and this estimate is corrected from it.
+**Estimate corrected by measurement (2026-09-06).** The enrichment run fetched
+every work, so the full corpus was measurable rather than projected:
+
+| | Projected (60 samples) | **Actual (all 6,482)** |
+|---|---|---|
+| Raw | 21 MB | **48.8 MB** |
+| Gzipped | 8 MB | **14.2 MB** |
+| Avg per work | 3.3 KB | 7.7 KB |
+| Largest work | — | 350 KB |
+
+The projection was **2.3x low** — the heavy tail flagged as a risk was heavier
+than allowed for. The conclusion is unchanged: 14.2MB gzipped is trivial against
+a ~1GB limit, and no single work approaches the 100MB file cap.
+
+**The corpus is already downloaded.** `.cache/` holds all 6,482 works (57MB of
+API responses). Phase 7 can be built entirely from cache with **zero further
+requests to Wikimedia** — steps 1 and 2 below are local transforms, not fetches.
+Chapter subpages are not yet cached and would need fetching if their text is
+wanted; root works alone are complete.
 
 ## Licensing — the precondition
 
