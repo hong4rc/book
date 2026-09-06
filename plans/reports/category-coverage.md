@@ -1,6 +1,6 @@
 # Category coverage
 
-Generated 2026-09-05 from 6482 records.
+Generated 2026-09-06 from 6482 records.
 
 ## Facets
 
