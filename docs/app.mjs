@@ -8,6 +8,7 @@
  * storage is unavailable. Bookmarks and offline copies are enhancements, and
  * their failures are contained rather than allowed to reach the page.
  */
+import { el, appendAll } from './dom.mjs'
 import { loadIndex, getIndex, search } from './search.mjs'
 import { renderDetail } from './book.mjs'
 import * as bookmarks from './bookmarks.mjs'
@@ -16,11 +17,6 @@ import * as offline from './offline.mjs'
 const RESULT_LIMIT = 100
 
 const $ = (sel) => document.querySelector(sel)
-const el = (tag, props = {}, children = []) => {
-  const node = Object.assign(document.createElement(tag), props)
-  for (const child of [].concat(children)) if (child) node.append(child)
-  return node
-}
 
 const state = {
   query: '',

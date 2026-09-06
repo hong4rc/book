@@ -6,6 +6,7 @@
  * from the record itself, precomputed at build time, so showing them costs no
  * extra request.
  */
+import { el, appendAll } from './dom.mjs'
 import { getIndex } from './search.mjs'
 import * as bookmarks from './bookmarks.mjs'
 import * as offline from './offline.mjs'
@@ -37,14 +38,6 @@ export async function getBook(ord) {
   const record = shard[ord]
   if (!record) throw new Error(`book ${ord} not found`)
   return record
-}
-
-const el = (tag, props = {}, children = []) => {
-  const node = Object.assign(document.createElement(tag), props)
-  for (const child of [].concat(children)) {
-    if (child) node.append(child)
-  }
-  return node
 }
 
 /** Only ever emit links the browser will navigate, never javascript: or data:. */
@@ -184,7 +177,8 @@ export async function renderDetail(ord, { onOpen, onClose, onOfflineChange }) {
   if (book.quality) meta.push(`proofread ${book.quality}`)
   meta.push(book.license)
 
-  panel.append(
+  appendAll(
+    panel,
     close,
     el('h2', { textContent: book.title }),
     el('p', { className: 'muted', textContent: meta.join(' · ') }),

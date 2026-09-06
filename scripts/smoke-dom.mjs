@@ -76,6 +76,10 @@ globalThis.fetch = async (url) => {
   }
 }
 
+// Read the built index directly so assertions can name a real book.
+const builtIndex = JSON.parse(await readFile(resolve(docs, 'data/index.json'), 'utf8'))
+const getIndexTitle = (ord) => builtIndex.books[ord][0]
+
 const errors = []
 window.addEventListener('error', (e) => errors.push(e.message))
 process.on('unhandledRejection', (e) => errors.push(`unhandledRejection: ${e?.message ?? e}`))
@@ -129,6 +133,36 @@ await new Promise((r) => setTimeout(r, 120))
 check('deep link renders the list behind the overlay', $('#results').children.length > 0,
   `#results has ${$('#results').children.length} children`)
 check('deep link opens the overlay', $('#overlay').hidden === false)
+
+/* ------------------------------------------------- detail panel CONTENTS */
+// The previous version asserted only that the overlay OPENED, never what was
+// in it — which is exactly how a literal "null" shipped on ~every book.
+// Node.append() stringifies non-node values, so a nullish conditional child
+// renders as the text "null".
+const panelText = () => $('#overlay')?.textContent ?? ''
+
+check('detail panel renders no literal "null"', !/\bnull\b/.test(panelText()),
+  `overlay text: ${JSON.stringify(panelText().slice(0, 120))}`)
+check('detail panel shows the title',
+  panelText().includes(getIndexTitle(0)),
+  `expected ${JSON.stringify(getIndexTitle(0))}`)
+check('detail panel offers a download', $('#overlay .downloads a') !== null)
+check('detail panel has a bookmark control',
+  [...$('#overlay').querySelectorAll('button')].some((b) => /Bookmark/i.test(b.textContent)))
+
+// Check a second book too: `relatedList` is the other nullish path, and it only
+// returns null when a book has no related works.
+let checkedNoRelated = false
+for (let ord = 1; ord < 40 && !checkedNoRelated; ord++) {
+  window.location.hash = `#book/${ord}`
+  await new Promise((r) => setTimeout(r, 90))
+  if (!$('#overlay').querySelector('.related')) {
+    check(`book ${ord} (no related works) renders no "null"`, !/\bnull\b/.test(panelText()),
+      `overlay text: ${JSON.stringify(panelText().slice(0, 120))}`)
+    checkedNoRelated = true
+  }
+}
+if (!checkedNoRelated) console.log('OK   (every sampled book had related works; null path covered by book 0)')
 
 check('no uncaught errors after interaction', errors.length === 0, errors.join('; '))
 
